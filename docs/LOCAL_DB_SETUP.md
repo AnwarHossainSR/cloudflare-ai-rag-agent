@@ -84,7 +84,7 @@ docker run -d --name devdocs-pg -p 5432:5432 \
 After both pieces are done, from the repo root:
 
 ```bash
-bun --cwd apps/backend run migration:run
+cd apps/backend && bun run migration:run
 ```
 
 Then confirm the schema:

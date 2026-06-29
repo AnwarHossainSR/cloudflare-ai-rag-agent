@@ -17,4 +17,5 @@ export const AppDataSource = new DataSource({
   logging: false,
   entities: [User, Document, DocumentChunk],
   migrations: [join(__dirname, 'migrations/*.{ts,js}')],
+  migrationsTransactionMode: 'each',
 });
