@@ -3,7 +3,7 @@
 Tracks execution of [IMPLEMENTATION_PLAN.md](IMPLEMENTATION_PLAN.md), task by task.
 Workflow: implement one task → tests green → commit → ask before next task.
 
-**Status:** 12 / 29 tasks complete · currently at **M1.7**
+**Status:** 13 / 29 tasks complete · currently at **M1.8**
 **Last updated:** 2026-06-29
 
 ---
@@ -39,15 +39,15 @@ with mocks, so building continues independently.
 - [x] **1.4** Token-aware chunking utility (`chunkText`) + tests
 - [x] **1.5** Embeddings pipeline: chunk → embed → persist `DocumentChunk` rows (2 tests)
 - [x] **1.6** DocumentsModule: JWT upload/process/list/get/delete for txt/md (6 tests)
+- [x] **1.7** RagModule: pgvector retrieval + grounded answer with citations (4 tests)
 
-**Tests:** 21 backend specs passing · backend `nest build` clean · frontend `vite build` clean · backend boots against live `devdocs` DB
+**Tests:** 25 backend specs passing · backend `nest build` clean · frontend `vite build` clean · backend boots against live `devdocs` DB
 
 ---
 
 ## ⏳ Remaining
 
 ### Milestone 1 — Basic RAG
-- [ ] **1.7** RagModule + RagService — pgvector retrieval + grounded answer w/ citations + tests
 - [ ] **1.8** Frontend — auth store, router, API hooks, Login + Dashboard
 - [ ] **1.9** Frontend — FileUploader + Upload/List documents pages
 - [ ] **1.10** Frontend — ChatWindow + RAG query + citations (**M1 end-to-end**)
