@@ -2,7 +2,9 @@ import { Navigate, Route, Routes } from 'react-router-dom';
 import { EmptyState } from './components/EmptyState';
 import { ProtectedRoute } from './components/ProtectedRoute';
 import { Dashboard } from './pages/Dashboard';
+import { DocumentsList } from './pages/DocumentsList';
 import { Login } from './pages/Login';
+import { UploadDocuments } from './pages/UploadDocuments';
 
 function Placeholder({ title }: { title: string }) {
   return (
@@ -20,8 +22,8 @@ export function AppRoutes() {
       <Route path="/login" element={<Login />} />
       <Route element={<ProtectedRoute />}>
         <Route index element={<Dashboard />} />
-        <Route path="/documents/upload" element={<Placeholder title="Upload documents" />} />
-        <Route path="/documents" element={<Placeholder title="Documents" />} />
+        <Route path="/documents/upload" element={<UploadDocuments />} />
+        <Route path="/documents" element={<DocumentsList />} />
         <Route path="/chat" element={<Placeholder title="Chat" />} />
         <Route path="/agents/:runId" element={<Placeholder title="Agent run" />} />
         <Route path="/settings" element={<Placeholder title="Settings" />} />
