@@ -3,11 +3,12 @@
   "private": true,
   "workspaces": ["apps/*", "packages/*"],
   "scripts": {
+    "dev": "bash scripts/dev.sh",
     "build:shared": "tsc -p packages/shared/tsconfig.json",
     "prepare": "tsc -p packages/shared/tsconfig.json",
-    "dev:backend": "bun --cwd apps/backend run start:dev",
-    "dev:frontend": "bun --cwd apps/frontend run dev",
-    "migration:run": "bun --cwd apps/backend run migration:run"
+    "dev:backend": "cd apps/backend && bun run start:dev",
+    "dev:frontend": "cd apps/frontend && bun run dev",
+    "migration:run": "cd apps/backend && bun run migration:run"
   },
   "devDependencies": { "typescript": "^5.5.4" }
 }

@@ -307,7 +307,7 @@ async function bootstrap() {
   const app = await NestFactory.create(AppModule);
   app.setGlobalPrefix('api');
   app.useGlobalPipes(new ValidationPipe({ whitelist: true, transform: true }));
-  app.enableCors({ origin: process.env.FRONTEND_ORIGIN ?? 'http://localhost:5173', credentials: true });
+  app.enableCors({ origin: process.env.FRONTEND_ORIGIN ?? 'http://localhost:3000', credentials: true });
   await app.listen(process.env.PORT ?? 3000);
 }
 bootstrap();
@@ -327,7 +327,7 @@ bootstrap();
 - Create: `apps/frontend/package.json`, `vite.config.ts`, `tailwind.config.ts`, `postcss.config.js`, `index.html`, `src/main.tsx`, `src/App.tsx`, `src/index.css`, `src/lib/queryClient.ts`, `src/lib/axios.ts`
 
 **Interfaces:**
-- Produces: Vite dev server on :5173; React Query `QueryClientProvider`; axios instance `api` reading base URL from `VITE_API_URL` and attaching the JWT from the auth store.
+- Produces: Vite dev server on :3000; React Query `QueryClientProvider`; axios instance `api` reading base URL from `VITE_API_URL` and attaching the JWT from the auth store.
 
 - [ ] **Step 1: Create `apps/frontend/package.json`** with React 18, Vite, React Router, React Query, Zustand, axios, Tailwind, Vitest + Testing Library.
 
@@ -369,7 +369,7 @@ api.interceptors.response.use((r) => r, (err) => {
 
 - [ ] **Step 3: Create `src/main.tsx` + `src/App.tsx`** wrapping `QueryClientProvider` + `BrowserRouter` (router filled in Task 1.8). Configure Tailwind (`tailwind.config.ts` content globs `./index.html`, `./src/**/*.{ts,tsx}`; `src/index.css` with the three `@tailwind` directives).
 
-- [ ] **Step 4: Run** `bun --cwd apps/frontend run dev`. Expected: Vite serves at :5173 with a Tailwind-styled placeholder. Stop it.
+- [ ] **Step 4: Run** `bun --cwd apps/frontend run dev`. Expected: Vite serves at :3000 with a Tailwind-styled placeholder. Stop it.
 
 - [ ] **Step 5: Commit** `git commit -am "feat(frontend): vite+react+tailwind+react-query bootstrap"`.
 
@@ -1193,7 +1193,7 @@ export function buildAgentGraph(deps) {
 **Frontend tests:** `bun --cwd apps/frontend run test` — all green.
 
 **M1 manual flow:**
-1. Start backend + frontend; open http://localhost:5173.
+1. Start backend + frontend; open http://localhost:3000.
 2. Register → land on Dashboard.
 3. Upload a `.md` file (e.g. an API doc). Confirm it reaches `ready` with a chunk count > 0.
 4. Open Chat, ask a question answerable from the doc. Confirm: a grounded answer, a source list citing `documentName #chunkIndex`, and a confidence badge.
