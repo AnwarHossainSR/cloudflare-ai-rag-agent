@@ -3,7 +3,7 @@
 Tracks execution of [IMPLEMENTATION_PLAN.md](IMPLEMENTATION_PLAN.md), task by task.
 Workflow: implement one task → tests green → commit → ask before next task.
 
-**Status:** 16 / 29 tasks complete · currently at **M2.1**
+**Status:** 16 / 30 tasks complete · currently at **M2.0**
 **Last updated:** 2026-06-29
 
 ---
@@ -54,6 +54,7 @@ with mocks, so building continues independently.
 All M1 code tasks complete. Live end-to-end verification remains deferred until pgvector is installed.
 
 ### Milestone 2 — PDF, Chat History, Citations, Doc Management
+- [ ] **2.0** Frontend visual system refresh (production-grade app shell + source rail)
 - [ ] **2.1** PDF text extraction (`pdf-parse`)
 - [ ] **2.2** ChatModule — persisted sessions + messages
 - [ ] **2.3** Frontend — chat history sidebar + richer citations
