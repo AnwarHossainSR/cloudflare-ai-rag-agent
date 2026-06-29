@@ -1,15 +1,20 @@
 import { ChatWindow } from '../components/ChatWindow';
+import { AppShell } from '../components/AppShell';
+import { useAuthStore } from '../stores/auth';
 
 export function Chat() {
+  const user = useAuthStore((s) => s.user);
+  const logout = useAuthStore((s) => s.logout);
+
   return (
-    <main className="min-h-screen bg-[#eef3f1] px-6 py-8 text-slate-950">
-      <div className="mx-auto max-w-5xl space-y-6">
-        <header className="border-b border-slate-300 pb-5">
-          <p className="font-mono text-xs uppercase tracking-wider text-cyan-700">Grounded RAG</p>
-          <h1 className="mt-1 text-3xl font-semibold">Chat</h1>
+    <AppShell onLogout={logout} title="Chat" userEmail={user?.email}>
+      <div className="space-y-6">
+        <header className="border-b border-line pb-5">
+          <p className="font-mono text-xs uppercase text-cyan-700">Grounded RAG</p>
+          <h1 className="mt-1 text-2xl font-semibold">Chat</h1>
         </header>
         <ChatWindow />
       </div>
-    </main>
+    </AppShell>
   );
 }

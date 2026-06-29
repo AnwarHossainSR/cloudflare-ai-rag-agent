@@ -3,7 +3,7 @@
 Tracks execution of [IMPLEMENTATION_PLAN.md](IMPLEMENTATION_PLAN.md), task by task.
 Workflow: implement one task → tests green → commit → ask before next task.
 
-**Status:** 16 / 30 tasks complete · currently at **M2.0**
+**Status:** 17 / 30 tasks complete · currently at **M2.1**
 **Last updated:** 2026-06-29
 
 ---
@@ -13,14 +13,13 @@ Workflow: implement one task → tests green → commit → ask before next task
 | Tool | State |
 |------|-------|
 | bun 1.3.14 / node 24 / git | ✅ available |
-| Docker | ❌ removed (per request) — using local Postgres |
-| Postgres 18 (`localhost:5432`, `postgres`/`postgres`, db `devdocs`) | ✅ reachable, db created |
-| pgvector extension | ⛔ **NOT installed** (needs admin) — blocks live migration only |
+| Docker | ⏳ compose setup added; install/start pending |
+| Postgres 18 (`localhost:5433`, `postgres`/`postgres`, db `devdocs`) | ⏳ Docker service pending |
+| pgvector extension | ⏳ installed automatically by Docker init once DB starts |
 | Redis (`localhost:6379`) | ⏳ needed at M4 only, not yet set up |
 
-Live-DB steps (migration run, end-to-end browser flows) are **deferred** until pgvector is
-installed — see [docs/LOCAL_DB_SETUP.md](docs/LOCAL_DB_SETUP.md). All code is unit-tested
-with mocks, so building continues independently.
+Live-DB steps (migration run, end-to-end browser flows) are **deferred** until Docker Postgres
+with pgvector is running. All code is unit-tested with mocks, so building continues independently.
 
 ---
 
@@ -44,7 +43,10 @@ with mocks, so building continues independently.
 - [x] **1.9** Frontend document upload/list hooks, FileUploader, DocumentCard, pages (1 test)
 - [x] **1.10** Frontend ChatWindow + RAG query + citations (**M1 complete**, 1 test; live E2E deferred until pgvector)
 
-**Tests:** 25 backend specs passing · 3 frontend tests passing · backend `nest build` clean · frontend `vite build` clean · backend boots against live `devdocs` DB
+### Milestone 2 — PDF, Chat History, Citations, Doc Management (in progress)
+- [x] **2.0** Frontend visual system refresh: app shell, status badges, source rail, polished document/upload/chat surfaces
+
+**Tests:** 25 backend specs passing · 6 frontend tests passing · backend `nest build` clean · frontend `vite build` clean
 
 ---
 
@@ -54,7 +56,6 @@ with mocks, so building continues independently.
 All M1 code tasks complete. Live end-to-end verification remains deferred until pgvector is installed.
 
 ### Milestone 2 — PDF, Chat History, Citations, Doc Management
-- [ ] **2.0** Frontend visual system refresh (production-grade app shell + source rail)
 - [ ] **2.1** PDF text extraction (`pdf-parse`)
 - [ ] **2.2** ChatModule — persisted sessions + messages
 - [ ] **2.3** Frontend — chat history sidebar + richer citations

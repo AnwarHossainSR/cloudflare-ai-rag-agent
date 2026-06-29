@@ -39,15 +39,15 @@ export function FileUploader({ onUploaded }: FileUploaderProps) {
   }
 
   return (
-    <section className="rounded-lg border border-slate-300 bg-white p-5 shadow-sm">
+    <section className="ui-panel p-5">
       <label
         onDragOver={(event) => event.preventDefault()}
         onDrop={onDrop}
-        className="flex cursor-pointer flex-col items-center justify-center rounded-lg border border-dashed border-cyan-700 bg-[#eef3f1] px-5 py-10 text-center focus-within:ring-2 focus-within:ring-cyan-500"
+        className="flex cursor-pointer flex-col items-center justify-center rounded-md border border-dashed border-cyan-700 bg-paper px-5 py-10 text-center focus-within:ring-2 focus-within:ring-cyan-700"
       >
-        <span className="text-base font-semibold text-slate-950">Drop a document here</span>
-        <span className="mt-1 text-sm text-slate-600">txt or md, max 10MB</span>
-        <span className="mt-4 rounded-lg bg-slate-950 px-4 py-2 text-sm font-semibold text-white">
+        <span className="text-base font-semibold text-ink">Drop a document here</span>
+        <span className="mt-1 text-sm text-muted">txt or md, max 10MB</span>
+        <span className="mt-4 rounded-md bg-ink px-4 py-2 text-sm font-semibold text-white">
           Choose document
         </span>
         <input

@@ -1,24 +1,25 @@
 import { Link } from 'react-router-dom';
 import { useDocuments } from '../api/documents';
+import { AppShell } from '../components/AppShell';
 import { DocumentCard } from '../components/DocumentCard';
 import { EmptyState } from '../components/EmptyState';
 import { LoadingState } from '../components/LoadingState';
+import { useAuthStore } from '../stores/auth';
 
 export function DocumentsList() {
   const documents = useDocuments();
+  const user = useAuthStore((s) => s.user);
+  const logout = useAuthStore((s) => s.logout);
 
   return (
-    <main className="min-h-screen bg-[#eef3f1] px-6 py-8 text-slate-950">
-      <div className="mx-auto max-w-5xl space-y-6">
-        <header className="flex flex-wrap items-end justify-between gap-4 border-b border-slate-300 pb-5">
+    <AppShell onLogout={logout} title="Documents" userEmail={user?.email}>
+      <div className="space-y-6">
+        <header className="flex flex-wrap items-end justify-between gap-4 border-b border-line pb-5">
           <div>
-            <p className="font-mono text-xs uppercase tracking-wider text-cyan-700">Knowledge base</p>
-            <h1 className="mt-1 text-3xl font-semibold">Documents</h1>
+            <p className="font-mono text-xs uppercase text-cyan-700">Knowledge base</p>
+            <h1 className="mt-1 text-2xl font-semibold">Documents</h1>
           </div>
-          <Link
-            className="rounded-lg bg-slate-950 px-4 py-2 text-sm font-semibold text-white hover:bg-cyan-900 focus:outline-none focus:ring-2 focus:ring-cyan-500"
-            to="/documents/upload"
-          >
+          <Link className="ui-button-primary" to="/documents/upload">
             Upload
           </Link>
         </header>
@@ -33,6 +34,6 @@ export function DocumentsList() {
           ))}
         </section>
       </div>
-    </main>
+    </AppShell>
   );
 }
