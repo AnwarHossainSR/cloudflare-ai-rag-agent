@@ -1,6 +1,10 @@
 # DevDocs AI Copilot — Implementation Plan
 
 > **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
+>
+> **Execution workflow (checkpoint per task):** Implement **one task at a time**. After finishing a task — all its steps done, tests green, committed — **STOP and ask the human partner for approval before starting the next task** (e.g. "Task 1.2 complete and committed. Proceed with Task 1.3?"). Do not batch multiple tasks without an explicit go-ahead.
+>
+> **Local infrastructure (no Docker):** Postgres runs as a **local install** (not Docker). Connection: host `localhost:5432`, user `postgres`, password `postgres`, database `devdocs` → `DATABASE_URL=postgresql://postgres:postgres@localhost:5432/devdocs`. The `vector` (pgvector) extension must be installed on that local server. Redis (needed only from M4) likewise runs locally at `redis://localhost:6379`.
 
 ## Context
 
@@ -60,7 +64,6 @@ This plan is sequenced into four milestones so each produces working, testable s
 ```
 ai-implementation/
 ├─ package.json                      # Bun workspace root: { "workspaces": ["apps/*","packages/*"] }
-├─ docker-compose.yml                # postgres(pgvector) + redis
 ├─ .env                              # root env (see Global Constraints)
 ├─ .env.example
 ├─ tsconfig.base.json
@@ -131,7 +134,6 @@ ai-implementation/
   "scripts": {
     "dev:backend": "bun --cwd apps/backend run start:dev",
     "dev:frontend": "bun --cwd apps/frontend run dev",
-    "db:up": "docker compose up -d",
     "migration:run": "bun --cwd apps/backend run migration:run"
   },
   "devDependencies": { "typescript": "^5.5.4" }
@@ -189,31 +191,26 @@ git init && git add -A && git commit -m "chore: bun workspace scaffold + shared 
 
 ---
 
-### Task 0.2: Docker infra (Postgres+pgvector, Redis) + env
+### Task 0.2: Local infra (Postgres+pgvector, Redis) + env
+
+**No Docker.** Postgres (and, from M4, Redis) run as **local installs** on the dev machine.
 
 **Files:**
-- Create: `docker-compose.yml`, `.env.example`, `.env`
+- Create: `.env.example`, `.env`
 
 **Interfaces:**
-- Produces: Postgres reachable at `postgresql://devdocs:devdocs@localhost:5432/devdocs` with the `vector` extension available; Redis at `redis://localhost:6379`.
+- Produces: Postgres reachable at `postgresql://postgres:postgres@localhost:5432/devdocs` with the `vector` extension available; Redis at `redis://localhost:6379`.
 
-- [ ] **Step 1: Create `docker-compose.yml`**
+- [ ] **Step 1: Provision local Postgres** — a locally-installed PostgreSQL 16 server listening on `localhost:5432` with superuser `postgres` / password `postgres`. Create the app database:
 
-```yaml
-services:
-  postgres:
-    image: pgvector/pgvector:pg16
-    environment:
-      POSTGRES_USER: devdocs
-      POSTGRES_PASSWORD: devdocs
-      POSTGRES_DB: devdocs
-    ports: ["5432:5432"]
-    volumes: ["pgdata:/var/lib/postgresql/data"]
-  redis:
-    image: redis:7-alpine
-    ports: ["6379:6379"]
-volumes:
-  pgdata:
+```sql
+CREATE DATABASE devdocs;
+```
+
+  Then install the pgvector extension into that server (it does NOT ship with stock Postgres). On Windows the simplest route is the prebuilt pgvector binaries for your Postgres major version (drop `vector.dll` + the `vector*` files into the Postgres `lib/` and `share/extension/` dirs), or build from source. Verify it is available:
+
+```sql
+SELECT * FROM pg_available_extensions WHERE name = 'vector';
 ```
 
 - [ ] **Step 2: Create `.env.example`** with every variable from Global Constraints (values blank except the model IDs and local URLs), then copy to `.env` and fill Cloudflare creds locally.
@@ -223,15 +220,15 @@ CLOUDFLARE_ACCOUNT_ID=
 CLOUDFLARE_API_TOKEN=
 CLOUDFLARE_CHAT_MODEL=@cf/meta/llama-3.2-3b-instruct
 CLOUDFLARE_EMBEDDING_MODEL=@cf/baai/bge-large-en-v1.5
-DATABASE_URL=postgresql://devdocs:devdocs@localhost:5432/devdocs
+DATABASE_URL=postgresql://postgres:postgres@localhost:5432/devdocs
 JWT_SECRET=change-me-in-prod
 REDIS_URL=redis://localhost:6379
 PORT=3000
 ```
 
-- [ ] **Step 3: Start infra** `docker compose up -d`, then verify pgvector: `docker compose exec postgres psql -U devdocs -d devdocs -c "CREATE EXTENSION IF NOT EXISTS vector;"`. Expected: `CREATE EXTENSION`.
+- [ ] **Step 3: Verify connectivity + pgvector** — connect with `DATABASE_URL` and run `CREATE EXTENSION IF NOT EXISTS vector;` against the `devdocs` database. Expected: `CREATE EXTENSION` (this also happens automatically in the M1 migration). Redis can be installed later (only M4 needs it).
 
-- [ ] **Step 4: Commit** `git add docker-compose.yml .env.example && git commit -m "chore: postgres+pgvector and redis via docker compose"` (`.env` is gitignored).
+- [ ] **Step 4: Commit** `git add .env.example && git commit -m "chore: local postgres+pgvector and redis env config"` (`.env` is gitignored).
 
 ---
 
@@ -1179,7 +1176,7 @@ export function buildAgentGraph(deps) {
 - Create: `README.md`, `docs/DEPLOYMENT.md`, `apps/backend/Dockerfile`, `apps/frontend/Dockerfile`, `.env.example` (final)
 
 **Interfaces:**
-- Produces: a runnable README (local dev: `docker compose up`, `bun install`, `bun run migration:run`, `bun run dev:backend`, `bun run dev:frontend`) and `DEPLOYMENT.md` covering managed Postgres+pgvector, Redis, env/secrets, building both Docker images, running migrations on deploy, and swapping local storage for S3/R2.
+- Produces: a runnable README (local dev: install/start local Postgres+pgvector and Redis, `bun install`, `bun run migration:run`, `bun run dev:backend`, `bun run dev:frontend`) and `DEPLOYMENT.md` covering managed Postgres+pgvector, Redis, env/secrets, building both Docker images, running migrations on deploy, and swapping local storage for S3/R2.
 
 - [ ] **Step 1: Write `README.md`** (setup, env table, scripts, architecture diagram in text).
 - [ ] **Step 2: Write `docs/DEPLOYMENT.md`** + both Dockerfiles (backend: Bun base image running compiled Nest; frontend: build then serve static via nginx).
@@ -1189,7 +1186,7 @@ export function buildAgentGraph(deps) {
 
 ## Verification (end-to-end)
 
-**Infra:** `docker compose up -d` → Postgres(pgvector) + Redis healthy. `bun install` at root. `bun --cwd apps/backend run migration:run` applies all migrations (verify `\d document_chunks` shows `embedding vector(1024)` and the HNSW index exists).
+**Infra:** Local Postgres 16 (with pgvector) running on `localhost:5432` (user/pass `postgres`/`postgres`, db `devdocs`); Redis local on `localhost:6379` (M4 only). `bun install` at root. `bun --cwd apps/backend run migration:run` applies all migrations (verify `\d document_chunks` shows `embedding vector(1024)` and the HNSW index exists).
 
 **Backend tests:** `bun --cwd apps/backend run test` — all green, including the three required suites: `cloudflare-ai.service.spec`, `rag.service.spec`, `agents.service.spec`.
 
