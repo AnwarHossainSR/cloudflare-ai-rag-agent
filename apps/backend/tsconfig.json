@@ -7,9 +7,7 @@
     "allowSyntheticDefaultImports": true,
     "sourceMap": true,
     "outDir": "./dist",
-    "rootDir": "./src",
-    "incremental": true,
-    "baseUrl": "./"
+    "rootDir": "./src"
   },
   "include": ["src"],
   "exclude": ["node_modules", "dist", "**/*.spec.ts"]

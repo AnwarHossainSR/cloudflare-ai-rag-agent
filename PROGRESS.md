@@ -3,7 +3,7 @@
 Tracks execution of [IMPLEMENTATION_PLAN.md](IMPLEMENTATION_PLAN.md), task by task.
 Workflow: implement one task → tests green → commit → ask before next task.
 
-**Status:** 8 / 29 tasks complete · currently at **M1.3**
+**Status:** 9 / 29 tasks complete · currently at **M1.4**
 **Last updated:** 2026-06-29
 
 ---
@@ -35,16 +35,16 @@ with mocks, so building continues independently.
 ### Milestone 1 — Basic RAG (in progress)
 - [x] **1.1** DB layer: `vectorTransformer` (3 tests), `User`/`Document`/`DocumentChunk` entities, `AppDataSource`, `InitM1` migration (tables + HNSW cosine index). *Live `migration:run` deferred (pgvector).*
 - [x] **1.2** `CloudflareAiService` `embed()`/`chat()` + `CloudflareAiModule` (3 tests, fetch mocked)
+- [x] **1.3** Auth + Users: JWT register/login, `JwtAuthGuard`, `@CurrentUser`, DTOs (5 tests). TypeORM root wired with explicit entities; app **boots + connects to live DB** and registers `/api/auth`. *Live register/login deferred (needs migration → pgvector).*
 
-**Tests:** 6 backend specs passing · backend `nest build` clean · frontend `vite build` clean
+**Tests:** 11 backend specs passing · backend `nest build` clean · frontend `vite build` clean · backend boots against live `devdocs` DB
 
 ---
 
 ## ⏳ Remaining
 
 ### Milestone 1 — Basic RAG
-- [ ] **1.3** AuthModule + UsersModule — JWT register/login, `JwtAuthGuard`, `@CurrentUser` (← next)
-- [ ] **1.4** Token-aware chunking utility (`chunkText`) + tests
+- [ ] **1.4** Token-aware chunking utility (`chunkText`) + tests (← next)
 - [ ] **1.5** EmbeddingsModule — chunk → embed → persist pipeline + tests
 - [ ] **1.6** DocumentsModule — upload (txt/md) / process / list / get / delete + tests
 - [ ] **1.7** RagModule + RagService — pgvector retrieval + grounded answer w/ citations + tests
