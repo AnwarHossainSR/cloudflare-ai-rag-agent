@@ -8,6 +8,9 @@
     "prepare": "tsc -p packages/shared/tsconfig.json",
     "dev:backend": "cd apps/backend && bun run start:dev",
     "dev:frontend": "cd apps/frontend && bun run dev",
+    "db:up": "docker compose up -d postgres pgadmin",
+    "db:down": "docker compose down",
+    "db:logs": "docker compose logs -f postgres pgadmin",
     "migration:run": "cd apps/backend && bun run migration:run"
   },
   "devDependencies": { "typescript": "^5.5.4" }
