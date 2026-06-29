@@ -4,6 +4,7 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { validateEnv } from './config/env.validation';
 import { CloudflareAiModule } from './cloudflare-ai/cloudflare-ai.module';
 import { AuthModule } from './auth/auth.module';
+import { DocumentsModule } from './documents/documents.module';
 import { UsersModule } from './users/users.module';
 import { User } from './users/entities/user.entity';
 import { Document } from './documents/entities/document.entity';
@@ -24,6 +25,7 @@ import { DocumentChunk } from './documents/entities/document-chunk.entity';
     CloudflareAiModule,
     UsersModule,
     AuthModule,
+    DocumentsModule,
   ],
 })
 export class AppModule {}

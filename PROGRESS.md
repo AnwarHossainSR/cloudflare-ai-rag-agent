@@ -3,7 +3,7 @@
 Tracks execution of [IMPLEMENTATION_PLAN.md](IMPLEMENTATION_PLAN.md), task by task.
 Workflow: implement one task → tests green → commit → ask before next task.
 
-**Status:** 11 / 29 tasks complete · currently at **M1.6**
+**Status:** 12 / 29 tasks complete · currently at **M1.7**
 **Last updated:** 2026-06-29
 
 ---
@@ -38,15 +38,15 @@ with mocks, so building continues independently.
 - [x] **1.3** Auth + Users: JWT register/login, `JwtAuthGuard`, `@CurrentUser`, DTOs (5 tests). TypeORM root wired with explicit entities; app **boots + connects to live DB** and registers `/api/auth`. *Live register/login deferred (needs migration → pgvector).*
 - [x] **1.4** Token-aware chunking utility (`chunkText`) + tests
 - [x] **1.5** Embeddings pipeline: chunk → embed → persist `DocumentChunk` rows (2 tests)
+- [x] **1.6** DocumentsModule: JWT upload/process/list/get/delete for txt/md (6 tests)
 
-**Tests:** 15 backend specs passing · backend `nest build` clean · frontend `vite build` clean · backend boots against live `devdocs` DB
+**Tests:** 21 backend specs passing · backend `nest build` clean · frontend `vite build` clean · backend boots against live `devdocs` DB
 
 ---
 
 ## ⏳ Remaining
 
 ### Milestone 1 — Basic RAG
-- [ ] **1.6** DocumentsModule — upload (txt/md) / process / list / get / delete + tests
 - [ ] **1.7** RagModule + RagService — pgvector retrieval + grounded answer w/ citations + tests
 - [ ] **1.8** Frontend — auth store, router, API hooks, Login + Dashboard
 - [ ] **1.9** Frontend — FileUploader + Upload/List documents pages
