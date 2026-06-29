@@ -1,6 +1,7 @@
 import { Navigate, Route, Routes } from 'react-router-dom';
 import { EmptyState } from './components/EmptyState';
 import { ProtectedRoute } from './components/ProtectedRoute';
+import { Chat } from './pages/Chat';
 import { Dashboard } from './pages/Dashboard';
 import { DocumentsList } from './pages/DocumentsList';
 import { Login } from './pages/Login';
@@ -24,7 +25,7 @@ export function AppRoutes() {
         <Route index element={<Dashboard />} />
         <Route path="/documents/upload" element={<UploadDocuments />} />
         <Route path="/documents" element={<DocumentsList />} />
-        <Route path="/chat" element={<Placeholder title="Chat" />} />
+        <Route path="/chat" element={<Chat />} />
         <Route path="/agents/:runId" element={<Placeholder title="Agent run" />} />
         <Route path="/settings" element={<Placeholder title="Settings" />} />
       </Route>

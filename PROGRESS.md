@@ -3,7 +3,7 @@
 Tracks execution of [IMPLEMENTATION_PLAN.md](IMPLEMENTATION_PLAN.md), task by task.
 Workflow: implement one task → tests green → commit → ask before next task.
 
-**Status:** 15 / 29 tasks complete · currently at **M1.10**
+**Status:** 16 / 29 tasks complete · currently at **M2.1**
 **Last updated:** 2026-06-29
 
 ---
@@ -42,15 +42,16 @@ with mocks, so building continues independently.
 - [x] **1.7** RagModule: pgvector retrieval + grounded answer with citations (4 tests)
 - [x] **1.8** Frontend auth store/hooks, protected routes, Login + Dashboard shells (1 test)
 - [x] **1.9** Frontend document upload/list hooks, FileUploader, DocumentCard, pages (1 test)
+- [x] **1.10** Frontend ChatWindow + RAG query + citations (**M1 complete**, 1 test; live E2E deferred until pgvector)
 
-**Tests:** 25 backend specs passing · 2 frontend tests passing · backend `nest build` clean · frontend `vite build` clean · backend boots against live `devdocs` DB
+**Tests:** 25 backend specs passing · 3 frontend tests passing · backend `nest build` clean · frontend `vite build` clean · backend boots against live `devdocs` DB
 
 ---
 
 ## ⏳ Remaining
 
 ### Milestone 1 — Basic RAG
-- [ ] **1.10** Frontend — ChatWindow + RAG query + citations (**M1 end-to-end**)
+All M1 code tasks complete. Live end-to-end verification remains deferred until pgvector is installed.
 
 ### Milestone 2 — PDF, Chat History, Citations, Doc Management
 - [ ] **2.1** PDF text extraction (`pdf-parse`)
