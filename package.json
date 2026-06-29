@@ -1,0 +1,12 @@
+{
+  "name": "devdocs-ai-copilot",
+  "private": true,
+  "workspaces": ["apps/*", "packages/*"],
+  "scripts": {
+    "dev:backend": "bun --cwd apps/backend run start:dev",
+    "dev:frontend": "bun --cwd apps/frontend run dev",
+    "db:up": "docker compose up -d",
+    "migration:run": "bun --cwd apps/backend run migration:run"
+  },
+  "devDependencies": { "typescript": "^5.5.4" }
+}
