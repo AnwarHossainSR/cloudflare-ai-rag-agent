@@ -1,7 +1,8 @@
-import { AgentStepName, Confidence, SourceCitation } from '@devdocs/shared';
+import { AgentStepName, Confidence } from '@devdocs/shared';
 import { CloudflareAiService } from '../../cloudflare-ai/cloudflare-ai.service';
-import { RagService, RetrievedChunk } from '../../rag/rag.service';
+import { RagService } from '../../rag/rag.service';
 import { buildAnswerPrompt, parseConfidence } from '../../rag/prompts';
+import { buildContextText, toCitation } from '../../rag/rag.utils';
 import {
   buildClassifierPrompt,
   buildEvaluatorPrompt,
@@ -31,22 +32,6 @@ function withStep<TInput>(
     const { input, output, update } = await fn(state);
     const log: StepLog = { name, input, output, latencyMs: Date.now() - start };
     return { ...update, steps: [log] };
-  };
-}
-
-function buildContextText(chunks: RetrievedChunk[]): string {
-  return chunks
-    .map((chunk) => `[Doc: ${chunk.documentName} #${chunk.chunkIndex}]\n${chunk.content}`)
-    .join('\n\n');
-}
-
-function toCitation(chunk: RetrievedChunk): SourceCitation {
-  return {
-    documentId: chunk.documentId,
-    documentName: chunk.documentName,
-    chunkIndex: chunk.chunkIndex,
-    score: chunk.score,
-    snippet: chunk.content.slice(0, 200),
   };
 }
 

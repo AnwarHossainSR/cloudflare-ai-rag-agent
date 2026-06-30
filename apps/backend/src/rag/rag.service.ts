@@ -1,11 +1,12 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Confidence, RagQueryResponse, SourceCitation } from '@devdocs/shared';
+import { Confidence, RagQueryResponse } from '@devdocs/shared';
 import { Repository } from 'typeorm';
 import { CloudflareAiService } from '../cloudflare-ai/cloudflare-ai.service';
 import { vectorTransformer } from '../database/transformers/vector.transformer';
 import { DocumentChunk } from '../documents/entities/document-chunk.entity';
 import { buildAnswerPrompt, parseConfidence } from './prompts';
+import { buildContextText, toCitation } from './rag.utils';
 
 export interface RetrievedChunk {
   documentId: string;
@@ -51,9 +52,7 @@ export class RagService {
       };
     }
 
-    const context = chunks
-      .map((chunk) => `[Doc: ${chunk.documentName} #${chunk.chunkIndex}]\n${chunk.content}`)
-      .join('\n\n');
+    const context = buildContextText(chunks);
     const { text } = await this.ai.chat(buildAnswerPrompt(context, question));
 
     return {
@@ -66,14 +65,4 @@ export class RagService {
 
 function clampTopK(topK: number): number {
   return Math.min(8, Math.max(5, topK));
-}
-
-function toCitation(chunk: RetrievedChunk): SourceCitation {
-  return {
-    documentId: chunk.documentId,
-    documentName: chunk.documentName,
-    chunkIndex: chunk.chunkIndex,
-    score: chunk.score,
-    snippet: chunk.content.slice(0, 200),
-  };
 }
