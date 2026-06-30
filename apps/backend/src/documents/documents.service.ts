@@ -36,7 +36,12 @@ export class DocumentsService {
     );
   }
 
-  async processInline(doc: Document, buffer: Buffer): Promise<void> {
+  /**
+   * Extracts text from the given buffer, embeds it, and updates the document's
+   * status accordingly (READY on success, FAILED + error on failure). Shared by
+   * the synchronous upload path (processInline) and the background queue processor.
+   */
+  async processFromBuffer(doc: Document, buffer: Buffer): Promise<void> {
     doc.status = DocumentStatus.PROCESSING;
     doc.error = null;
     await this.docs.save(doc);
@@ -52,6 +57,20 @@ export class DocumentsService {
     }
 
     await this.docs.save(doc);
+  }
+
+  /** @deprecated kept as a thin alias for processFromBuffer; prefer processFromBuffer directly. */
+  processInline(doc: Document, buffer: Buffer): Promise<void> {
+    return this.processFromBuffer(doc, buffer);
+  }
+
+  async findById(id: string): Promise<Document | null> {
+    return this.docs.findOne({ where: { id } });
+  }
+
+  async setStoragePath(doc: Document, storagePath: string): Promise<Document> {
+    doc.storagePath = storagePath;
+    return this.docs.save(doc);
   }
 
   async findAllForUser(userId: string): Promise<DocumentWithChunkCount[]> {

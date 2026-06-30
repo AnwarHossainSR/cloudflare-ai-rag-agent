@@ -1,6 +1,7 @@
 import { Module } from '@nestjs/common';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { TypeOrmModule } from '@nestjs/typeorm';
+import { BullModule } from '@nestjs/bullmq';
 import { validateEnv } from './config/env.validation';
 import { CloudflareAiModule } from './cloudflare-ai/cloudflare-ai.module';
 import { AuthModule } from './auth/auth.module';
@@ -28,6 +29,19 @@ import { AgentStep } from './agents/entities/agent-step.entity';
         entities: [User, Document, DocumentChunk, ChatSession, ChatMessage, AgentRun, AgentStep],
         synchronize: false,
       }),
+    }),
+    BullModule.forRootAsync({
+      inject: [ConfigService],
+      useFactory: (config: ConfigService) => {
+        const redisUrl = new URL(config.getOrThrow<string>('REDIS_URL'));
+        return {
+          connection: {
+            host: redisUrl.hostname,
+            port: Number(redisUrl.port) || 6379,
+            ...(redisUrl.password ? { password: redisUrl.password } : {}),
+          },
+        };
+      },
     }),
     CloudflareAiModule,
     UsersModule,

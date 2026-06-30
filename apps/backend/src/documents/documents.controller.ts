@@ -15,14 +15,20 @@ import { FileInterceptor } from '@nestjs/platform-express';
 import { CurrentUser } from '../auth/decorators/current-user.decorator';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 import { CurrentUserData } from '../auth/strategies/jwt.strategy';
+import { DocumentsQueueService } from './documents.queue';
 import { DocumentsService, UploadedFileMeta } from './documents.service';
+import { StorageService } from './storage.service';
 
 type UploadedBufferFile = UploadedFileMeta & { buffer: Buffer };
 
 @Controller('documents')
 @UseGuards(JwtAuthGuard)
 export class DocumentsController {
-  constructor(private readonly documents: DocumentsService) {}
+  constructor(
+    private readonly documents: DocumentsService,
+    private readonly storage: StorageService,
+    private readonly queue: DocumentsQueueService,
+  ) {}
 
   @Post('upload')
   @UseInterceptors(FileInterceptor('file'))
@@ -41,7 +47,9 @@ export class DocumentsController {
     file: UploadedBufferFile,
   ) {
     const doc = await this.documents.create(user.userId, file);
-    await this.documents.processInline(doc, file.buffer);
+    const storagePath = await this.storage.save(doc.id, file.buffer, file.originalname);
+    await this.documents.setStoragePath(doc, storagePath);
+    await this.queue.enqueueProcessing(doc.id);
     return this.documents.findOneForUser(user.userId, doc.id);
   }
 

@@ -41,6 +41,9 @@ export class Document {
   @Column({ type: 'text', nullable: true })
   error!: string | null;
 
+  @Column({ name: 'storage_path', type: 'varchar', length: 1024, nullable: true })
+  storagePath!: string | null;
+
   @CreateDateColumn({ name: 'created_at', type: 'timestamptz' })
   createdAt!: Date;
 
