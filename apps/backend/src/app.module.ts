@@ -7,6 +7,7 @@ import { AuthModule } from './auth/auth.module';
 import { DocumentsModule } from './documents/documents.module';
 import { RagModule } from './rag/rag.module';
 import { ChatModule } from './chat/chat.module';
+import { AgentsModule } from './agents/agents.module';
 import { UsersModule } from './users/users.module';
 import { User } from './users/entities/user.entity';
 import { Document } from './documents/entities/document.entity';
@@ -34,6 +35,7 @@ import { AgentStep } from './agents/entities/agent-step.entity';
     DocumentsModule,
     RagModule,
     ChatModule,
+    AgentsModule,
   ],
 })
 export class AppModule {}
