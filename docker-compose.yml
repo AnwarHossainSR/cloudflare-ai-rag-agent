@@ -24,7 +24,7 @@ services:
       postgres:
         condition: service_healthy
     environment:
-      PGADMIN_DEFAULT_EMAIL: admin@devdocs.local
+      PGADMIN_DEFAULT_EMAIL: admin@devdocs.ai
       PGADMIN_DEFAULT_PASSWORD: admin
     ports:
       - "5050:80"
