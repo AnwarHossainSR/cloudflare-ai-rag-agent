@@ -1,7 +1,9 @@
 import { DocumentStatus } from '../api/documents';
 import { Confidence } from '../api/rag';
 
-type StatusBadgeKind = DocumentStatus | Confidence;
+type AgentRunStatus = 'completed' | 'failed';
+
+type StatusBadgeKind = DocumentStatus | Confidence | AgentRunStatus;
 
 interface StatusBadgeProps {
   label: StatusBadgeKind;
@@ -12,6 +14,7 @@ const styles: Record<StatusBadgeKind, string> = {
   processing: 'bg-cyan-700/10 text-cyan-800 ring-cyan-700/20',
   ready: 'bg-verified/10 text-verified ring-verified/20',
   failed: 'bg-danger/10 text-danger ring-danger/20',
+  completed: 'bg-verified/10 text-verified ring-verified/20',
   High: 'bg-verified/10 text-verified ring-verified/20',
   Medium: 'bg-warning/10 text-warning ring-warning/20',
   Low: 'bg-danger/10 text-danger ring-danger/20',

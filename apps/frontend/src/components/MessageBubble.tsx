@@ -1,3 +1,4 @@
+import { Link } from 'react-router-dom';
 import { Confidence, SourceCitation } from '../api/rag';
 import { SourceCitationList } from './SourceCitationList';
 import { StatusBadge } from './StatusBadge';
@@ -8,6 +9,8 @@ export interface ChatMessage {
   content: string;
   confidence?: Confidence;
   citations?: SourceCitation[];
+  /** Present on agent-mode assistant messages; links to the persisted agent run. */
+  runId?: string;
 }
 
 interface MessageBubbleProps {
@@ -38,6 +41,14 @@ export function MessageBubble({ message }: MessageBubbleProps) {
         </div>
         <p className="mt-2 whitespace-pre-wrap text-sm leading-6 text-secondary">{message.content}</p>
         {message.citations ? <SourceCitationList citations={message.citations} /> : null}
+        {message.runId ? (
+          <Link
+            className="mt-3 inline-flex items-center gap-1 text-xs font-medium text-accent hover:underline"
+            to={`/agents/${message.runId}`}
+          >
+            View run details →
+          </Link>
+        ) : null}
       </article>
     </div>
   );

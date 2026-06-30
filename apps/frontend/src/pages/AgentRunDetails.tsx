@@ -1,13 +1,17 @@
 import { Link, useParams } from 'react-router-dom';
+import { useAgentRun } from '../api/agents';
+import { AgentStepTimeline } from '../components/AgentStepTimeline';
 import { AppShell } from '../components/AppShell';
+import { EmptyState } from '../components/EmptyState';
+import { LoadingState } from '../components/LoadingState';
+import { StatusBadge } from '../components/StatusBadge';
 import { useAuthStore } from '../stores/auth';
-
-const PLANNED_STEPS = ['Retrieve', 'Reason', 'Verify', 'Answer'];
 
 export function AgentRunDetails() {
   const { runId } = useParams();
   const user = useAuthStore((s) => s.user);
   const logout = useAuthStore((s) => s.logout);
+  const run = useAgentRun(runId);
 
   return (
     <AppShell
@@ -22,54 +26,53 @@ export function AgentRunDetails() {
         </Link>
       }
     >
-      <div className="space-y-5">
-        <section className="ui-card flex flex-wrap items-center justify-between gap-3">
-          <div>
-            <span className="rounded-full bg-panel2 px-2.5 py-1 text-xs font-semibold text-muted ring-1 ring-line">
-              Not started
-            </span>
-            <p className="mt-2 text-sm text-secondary">
-              Agent runs aren't wired up yet — the LangGraph loop lands in Milestone 3.
+      {run.isLoading ? (
+        <LoadingState label="Loading run" />
+      ) : run.isError || !run.data ? (
+        <EmptyState
+          title="Run not found"
+          body="This agent run doesn't exist, or you don't have access to it."
+        />
+      ) : (
+        <div className="space-y-5">
+          <section className="ui-card flex flex-wrap items-center justify-between gap-3">
+            <div>
+              <StatusBadge label={run.data.status === 'failed' ? 'failed' : 'completed'} />
+              <p className="mt-2 text-sm text-secondary">{run.data.question}</p>
+            </div>
+            <div className="flex gap-6 text-xs text-muted">
+              <div>
+                <p className="ui-eyebrow">Retries</p>
+                <p className="mt-0.5 font-mono text-ink">{run.data.retryCount}</p>
+              </div>
+              <div>
+                <p className="ui-eyebrow">Started</p>
+                <p className="mt-0.5 font-mono text-ink">
+                  {new Date(run.data.createdAt).toLocaleString()}
+                </p>
+              </div>
+              <div>
+                <p className="ui-eyebrow">Confidence</p>
+                <p className="mt-0.5 font-mono text-ink">
+                  {run.data.confidence ? <StatusBadge label={run.data.confidence} /> : '—'}
+                </p>
+              </div>
+            </div>
+          </section>
+
+          <section>
+            <h2 className="mb-3 text-sm font-semibold uppercase tracking-wider text-muted">Step timeline</h2>
+            <AgentStepTimeline steps={run.data.steps} />
+          </section>
+
+          <section className="ui-card">
+            <h2 className="text-sm font-semibold text-ink">Final output</h2>
+            <p className="mt-2 whitespace-pre-wrap text-sm leading-6 text-secondary">
+              {run.data.finalAnswer ?? 'No output yet — this run produced no final answer.'}
             </p>
-          </div>
-          <div className="flex gap-6 text-xs text-muted">
-            <div>
-              <p className="ui-eyebrow">Retries</p>
-              <p className="mt-0.5 font-mono text-ink">—</p>
-            </div>
-            <div>
-              <p className="ui-eyebrow">Started</p>
-              <p className="mt-0.5 font-mono text-ink">—</p>
-            </div>
-            <div>
-              <p className="ui-eyebrow">Finished</p>
-              <p className="mt-0.5 font-mono text-ink">—</p>
-            </div>
-          </div>
-        </section>
-
-        <section>
-          <h2 className="mb-3 text-sm font-semibold uppercase tracking-wider text-muted">Step timeline</h2>
-          <ol className="space-y-3">
-            {PLANNED_STEPS.map((step, index) => (
-              <li className="ui-card flex items-center gap-4 opacity-60" key={step}>
-                <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-panel2 font-mono text-xs text-muted">
-                  {index + 1}
-                </span>
-                <div className="flex-1">
-                  <p className="text-sm font-semibold text-ink">{step}</p>
-                  <p className="text-xs text-muted">Pending — arrives in Milestone 3</p>
-                </div>
-              </li>
-            ))}
-          </ol>
-        </section>
-
-        <section className="ui-card">
-          <h2 className="text-sm font-semibold text-ink">Final output</h2>
-          <p className="mt-2 text-sm text-secondary">No output yet — this run hasn't executed.</p>
-        </section>
-      </div>
+          </section>
+        </div>
+      )}
     </AppShell>
   );
 }
