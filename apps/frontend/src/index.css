@@ -2,28 +2,75 @@
 @tailwind components;
 @tailwind utilities;
 
+/* Theme tokens — dark is the default; `.light` on <html> overrides. */
 :root {
+  color-scheme: dark;
+  --c-paper: #0a0a0b;
+  --c-panel: #111214;
+  --c-panel2: #16181d;
+  --c-line: rgba(255, 255, 255, 0.08);
+  --c-ink: #f5f7fa;
+  --c-secondary: #a4acb9;
+  --c-muted: #7b8494;
+  --c-accent: #4f8cff;
+  --c-accent-cyan: #35c2ff;
+  --c-accent-violet: #8b5cf6;
+  --c-success: #22c55e;
+  --c-warning: #f59e0b;
+  --c-danger: #ef4444;
+}
+
+:root.light {
   color-scheme: light;
+  --c-paper: #f6f8fb;
+  --c-panel: #ffffff;
+  --c-panel2: #f9fafb;
+  --c-line: #e6eaf0;
+  --c-ink: #0f172a;
+  --c-secondary: #475569;
+  --c-muted: #64748b;
+  --c-accent: #2563eb;
+  --c-accent-cyan: #0891b2;
+  --c-accent-violet: #7c3aed;
+  --c-success: #16a34a;
+  --c-warning: #d97706;
+  --c-danger: #dc2626;
 }
 
 body {
-  @apply bg-paper text-ink antialiased;
+  @apply bg-paper font-sans text-ink antialiased;
 }
 
 @layer components {
   .focus-ring {
-    @apply focus:outline-none focus:ring-2 focus:ring-cyan-700 focus:ring-offset-2 focus:ring-offset-paper;
+    @apply focus:outline-none focus:ring-2 focus:ring-accent focus:ring-offset-2 focus:ring-offset-paper;
+  }
+
+  .ui-eyebrow {
+    @apply font-mono text-xs font-medium uppercase tracking-wider text-accent;
   }
 
   .ui-button-primary {
-    @apply rounded-md bg-ink px-4 py-2 text-sm font-semibold text-white hover:bg-cyan-900 disabled:cursor-not-allowed disabled:opacity-60 focus-ring;
+    @apply inline-flex items-center justify-center gap-2 rounded-md bg-accent px-4 py-2 text-sm font-semibold text-white shadow-sm transition hover:brightness-110 active:brightness-95 disabled:cursor-not-allowed disabled:opacity-60 focus-ring;
   }
 
   .ui-button-secondary {
-    @apply rounded-md border border-line bg-panel px-3 py-2 text-sm font-medium text-ink hover:bg-paper disabled:cursor-not-allowed disabled:opacity-60 focus-ring;
+    @apply inline-flex items-center justify-center gap-2 rounded-md border border-line bg-panel px-3 py-2 text-sm font-medium text-ink transition hover:bg-panel2 disabled:cursor-not-allowed disabled:opacity-60 focus-ring;
+  }
+
+  .ui-button-ghost {
+    @apply inline-flex items-center justify-center gap-2 rounded-md px-3 py-2 text-sm font-medium text-secondary transition hover:bg-panel2 hover:text-ink disabled:cursor-not-allowed disabled:opacity-60 focus-ring;
   }
 
   .ui-panel {
-    @apply rounded-md border border-line bg-panel shadow-sm;
+    @apply rounded-lg border border-line bg-panel shadow-sm;
+  }
+
+  .ui-card {
+    @apply rounded-lg border border-line bg-panel p-5 shadow-sm transition duration-200 hover:-translate-y-0.5;
+  }
+
+  .ui-input {
+    @apply w-full rounded-md border border-line bg-panel px-3 py-2 text-sm text-ink placeholder:text-muted transition focus-ring;
   }
 }
