@@ -19,34 +19,31 @@ export function Chat() {
   }
 
   return (
-    <AppShell onLogout={logout} title="Chat" userEmail={user?.email}>
-      <div className="space-y-6">
-        <header className="border-b border-line pb-5">
-          <p className="font-mono text-xs uppercase text-cyan-700">Grounded RAG</p>
-          <h1 className="mt-1 text-2xl font-semibold">Chat</h1>
-        </header>
-        <div className="grid gap-4 lg:grid-cols-[260px_1fr]">
-          <aside className="ui-panel p-3">
-            <div className="flex items-center justify-between gap-3">
-              <h2 className="text-sm font-semibold text-ink">Chats</h2>
-              <button
-                className="ui-button-secondary"
-                disabled={createSession.isPending}
-                onClick={startChat}
-                type="button"
-              >
-                New
-              </button>
-            </div>
-
-            <div className="mt-3 space-y-1">
-              {sessions.isLoading ? <LoadingState label="Loading chats" /> : null}
-              {sessions.data?.map((session) => (
+    <AppShell
+      onLogout={logout}
+      title="Chat"
+      userEmail={user?.email}
+      eyebrow="AI Copilot"
+      description="Ask grounded questions, answered from your indexed knowledge base with citations."
+      actions={
+        <button className="ui-button-primary" disabled={createSession.isPending} onClick={startChat} type="button">
+          New chat
+        </button>
+      }
+    >
+      <div className="grid h-[calc(100vh-220px)] min-h-[480px] gap-4 lg:grid-cols-[280px_1fr]">
+        <aside className="ui-panel flex flex-col overflow-hidden p-3">
+          <h2 className="px-1 text-sm font-semibold uppercase tracking-wider text-muted">Conversations</h2>
+          <div className="mt-3 flex-1 space-y-1 overflow-y-auto">
+            {sessions.isLoading ? <LoadingState label="Loading chats" /> : null}
+            {sessions.data?.map((session) => {
+              const isActive = session.id === selectedId;
+              return (
                 <button
-                  className={`block w-full rounded-md px-3 py-2 text-left text-sm focus-ring ${
-                    session.id === selectedId
-                      ? 'bg-cyan-50 font-semibold text-cyan-800'
-                      : 'text-muted hover:bg-paper hover:text-ink'
+                  className={`block w-full rounded-md border-l-2 px-3 py-2 text-left text-sm transition focus-ring ${
+                    isActive
+                      ? 'border-accent bg-panel2 font-semibold text-ink'
+                      : 'border-transparent text-secondary hover:bg-panel2/60 hover:text-ink'
                   }`}
                   key={session.id}
                   onClick={() => setSearchParams({ session: session.id })}
@@ -54,15 +51,15 @@ export function Chat() {
                 >
                   <span className="block truncate">{session.title}</span>
                 </button>
-              ))}
-              {!sessions.isLoading && !sessions.data?.length ? (
-                <p className="px-1 py-2 text-sm text-muted">No chats yet.</p>
-              ) : null}
-            </div>
-          </aside>
+              );
+            })}
+            {!sessions.isLoading && !sessions.data?.length ? (
+              <p className="px-1 py-2 text-sm text-muted">No chats yet — start one to begin.</p>
+            ) : null}
+          </div>
+        </aside>
 
-          <ChatWindow sessionId={selectedId} />
-        </div>
+        <ChatWindow sessionId={selectedId} />
       </div>
     </AppShell>
   );
