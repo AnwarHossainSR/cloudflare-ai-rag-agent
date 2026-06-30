@@ -5,24 +5,25 @@ export default {
   theme: {
     extend: {
       colors: {
-        // Backed by CSS variables in index.css so the same tokens flip between
-        // dark (default) and light themes without rewriting component classes.
-        paper: 'var(--c-paper)',
-        panel: 'var(--c-panel)',
-        panel2: 'var(--c-panel2)',
+        // Backed by CSS variables in index.css (RGB channels) so the same tokens
+        // flip between dark (default) and light themes AND support Tailwind opacity
+        // modifiers (e.g. bg-warning/10) without rewriting component classes.
+        paper: 'rgb(var(--c-paper) / <alpha-value>)',
+        panel: 'rgb(var(--c-panel) / <alpha-value>)',
+        panel2: 'rgb(var(--c-panel2) / <alpha-value>)',
         line: 'var(--c-line)',
-        ink: 'var(--c-ink)',
-        secondary: 'var(--c-secondary)',
-        muted: 'var(--c-muted)',
+        ink: 'rgb(var(--c-ink) / <alpha-value>)',
+        secondary: 'rgb(var(--c-secondary) / <alpha-value>)',
+        muted: 'rgb(var(--c-muted) / <alpha-value>)',
         accent: {
-          DEFAULT: 'var(--c-accent)',
-          cyan: 'var(--c-accent-cyan)',
-          violet: 'var(--c-accent-violet)',
+          DEFAULT: 'rgb(var(--c-accent) / <alpha-value>)',
+          cyan: 'rgb(var(--c-accent-cyan) / <alpha-value>)',
+          violet: 'rgb(var(--c-accent-violet) / <alpha-value>)',
         },
-        success: 'var(--c-success)',
-        verified: 'var(--c-success)',
-        warning: 'var(--c-warning)',
-        danger: 'var(--c-danger)',
+        success: 'rgb(var(--c-success) / <alpha-value>)',
+        verified: 'rgb(var(--c-success) / <alpha-value>)',
+        warning: 'rgb(var(--c-warning) / <alpha-value>)',
+        danger: 'rgb(var(--c-danger) / <alpha-value>)',
       },
       borderRadius: {
         sm: '10px',
