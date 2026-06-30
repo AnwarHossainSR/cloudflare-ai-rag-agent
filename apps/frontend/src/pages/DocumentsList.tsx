@@ -26,7 +26,7 @@ export function DocumentsList() {
 
         {documents.isLoading ? <LoadingState label="Loading documents" /> : null}
         {documents.data?.length === 0 ? (
-          <EmptyState title="No documents yet" body="Upload a txt or md file to start RAG chat." />
+          <EmptyState title="No documents yet" body="Upload a txt, md, or pdf file to start RAG chat." />
         ) : null}
         <section className="grid gap-3 md:grid-cols-2">
           {documents.data?.map((document) => (

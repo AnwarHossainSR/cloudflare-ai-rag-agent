@@ -10,6 +10,7 @@ export interface DocumentRecord {
   sizeBytes: number;
   status: DocumentStatus;
   error: string | null;
+  chunkCount: number;
   createdAt?: string;
 }
 
@@ -20,6 +21,10 @@ export function useDocuments() {
       const { data } = await api.get<DocumentRecord[]>('/documents');
       return data;
     },
+    refetchInterval: (query) =>
+      query.state.data?.some((doc) => doc.status === 'pending' || doc.status === 'processing')
+        ? 3000
+        : false,
   });
 }
 
@@ -40,6 +45,17 @@ export function useDeleteDocument() {
   const queryClient = useQueryClient();
   return useMutation({
     mutationFn: (id: string) => api.delete(`/documents/${id}`),
+    onSuccess: () => queryClient.invalidateQueries({ queryKey: ['documents'] }),
+  });
+}
+
+export function useReindexDocument() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: async (id: string) => {
+      const { data } = await api.post<DocumentRecord>(`/documents/${id}/reindex`);
+      return data;
+    },
     onSuccess: () => queryClient.invalidateQueries({ queryKey: ['documents'] }),
   });
 }
