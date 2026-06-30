@@ -21,6 +21,7 @@ describe('extractText', () => {
 
 describe('DocumentsService', () => {
   let repo: { create: jest.Mock; save: jest.Mock; find: jest.Mock; findOne: jest.Mock; remove: jest.Mock };
+  let chunks: { count: jest.Mock; find: jest.Mock; delete: jest.Mock };
   let embeddings: jest.Mocked<Pick<EmbeddingsService, 'processDocument'>>;
   let service: DocumentsService;
   let savedStatuses: DocumentStatus[];
@@ -36,9 +37,21 @@ describe('DocumentsService', () => {
       findOne: jest.fn(),
       remove: jest.fn(async (doc) => doc),
     };
+    chunks = {
+      count: jest.fn(async () => 2),
+      find: jest.fn(async () => [
+        { content: 'first chunk' },
+        { content: 'second chunk' },
+      ]),
+      delete: jest.fn(),
+    };
     savedStatuses = [];
     embeddings = { processDocument: jest.fn().mockResolvedValue(1) };
-    service = new DocumentsService(repo as any, embeddings as unknown as EmbeddingsService);
+    service = new DocumentsService(
+      repo as any,
+      chunks as any,
+      embeddings as unknown as EmbeddingsService,
+    );
   });
 
   it('creates a pending document with upload metadata', async () => {
@@ -78,5 +91,32 @@ describe('DocumentsService', () => {
     repo.findOne.mockResolvedValue({ id: 'doc-1', userId: 'user-2' });
 
     await expect(service.findOneForUser('user-1', 'doc-1')).rejects.toBeInstanceOf(NotFoundException);
+  });
+
+  it('returns chunk count for a document', async () => {
+    repo.findOne.mockResolvedValue({ id: 'doc-1', userId: 'user-1' });
+
+    const doc = await service.findOneForUser('user-1', 'doc-1');
+
+    expect(doc.chunkCount).toBe(2);
+    expect(chunks.count).toHaveBeenCalledWith({ where: { documentId: 'doc-1' } });
+  });
+
+  it('reindexes from existing chunks after clearing old chunks', async () => {
+    const doc = { id: 'doc-1', userId: 'user-1', filename: 'guide.md' };
+    repo.findOne.mockResolvedValue(doc);
+
+    await service.reindex('user-1', 'doc-1');
+
+    expect(chunks.find).toHaveBeenCalledWith({
+      where: { documentId: 'doc-1' },
+      order: { chunkIndex: 'ASC' },
+    });
+    expect(chunks.delete).toHaveBeenCalledWith({ documentId: 'doc-1' });
+    expect(embeddings.processDocument).toHaveBeenCalledWith(
+      'doc-1',
+      'first chunk\n\nsecond chunk',
+      'guide.md',
+    );
   });
 });

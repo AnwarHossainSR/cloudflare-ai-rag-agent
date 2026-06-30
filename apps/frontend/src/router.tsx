@@ -26,7 +26,9 @@ export function AppRoutes() {
         <Route path="/documents/upload" element={<UploadDocuments />} />
         <Route path="/documents" element={<DocumentsList />} />
         <Route path="/chat" element={<Chat />} />
+        <Route path="/agents" element={<Placeholder title="Agents" />} />
         <Route path="/agents/:runId" element={<Placeholder title="Agent run" />} />
+        <Route path="/sessions" element={<Placeholder title="Sessions" />} />
         <Route path="/settings" element={<Placeholder title="Settings" />} />
       </Route>
       <Route path="*" element={<Navigate to="/" replace />} />

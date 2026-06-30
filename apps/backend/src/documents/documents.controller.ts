@@ -55,6 +55,11 @@ export class DocumentsController {
     return this.documents.findOneForUser(user.userId, id);
   }
 
+  @Post(':id/reindex')
+  reindex(@CurrentUser() user: CurrentUserData, @Param('id') id: string) {
+    return this.documents.reindex(user.userId, id);
+  }
+
   @Delete(':id')
   async remove(@CurrentUser() user: CurrentUserData, @Param('id') id: string) {
     await this.documents.remove(user.userId, id);

@@ -4,15 +4,16 @@
 >
 > **Execution workflow (checkpoint per task):** Implement **one task at a time**. After finishing a task — all its steps done, tests green, committed — **STOP and ask the human partner for approval before starting the next task** (e.g. "Task 1.2 complete and committed. Proceed with Task 1.3?"). Do not batch multiple tasks without an explicit go-ahead.
 >
-> **Local infrastructure (no Docker):** Postgres runs as a **local install** (not Docker). Connection: host `localhost:5432`, user `postgres`, password `postgres`, database `devdocs` → `DATABASE_URL=postgresql://postgres:postgres@localhost:5432/devdocs`. The `vector` (pgvector) extension must be installed on that local server. Redis (needed only from M4) likewise runs locally at `redis://localhost:6379`.
+> **Local infrastructure:** Postgres runs through Docker Compose using `pgvector/pgvector:pg18`. Host connection: `localhost:5433`, user `postgres`, password `postgres`, database `devdocs` → `DATABASE_URL=postgresql://postgres:postgres@localhost:5433/devdocs`. pgAdmin runs at `http://localhost:5050`. Redis is needed only from M4.
 
 ## Context
 
 We are building **DevDocs AI Copilot** from scratch in an empty directory (`d:\Workspace\own\Agentic-AI\ai-implementation`). It is a full-stack RAG + agentic assistant: users upload technical docs (Markdown, PDFs, API notes, GitHub issue text, deployment notes), the backend chunks + embeds them into Postgres/pgvector, and users ask questions answered **only from retrieved context with source citations**. An optional **LangGraph agentic mode** plans → retrieves → evaluates → retries → answers → verifies, exposing each step in the UI.
 
-This plan is sequenced into four milestones so each produces working, testable software on its own:
+This plan is sequenced into milestones so each produces working, testable software on its own:
 - **M1** Basic RAG (txt/md upload → chunk → embed → retrieve → answer + sources).
 - **M2** PDF support, persisted chat history, structured citations, document management.
+- **M2.5** Premium dashboard redesign from `DESIGN.md` (dark-default SaaS shell, pages, polish).
 - **M3** LangGraph agentic loop with per-step UI.
 - **M4** Production hardening (BullMQ queue, cost tracking, request logs, rate limiting, eval dashboard, deploy guide).
 
@@ -20,7 +21,7 @@ This plan is sequenced into four milestones so each produces working, testable s
 
 **Architecture:** Bun-workspace monorepo. A NestJS REST backend owns all AI calls (never the browser) — `CloudflareAiService` wraps the Cloudflare Workers AI REST API for embeddings (`@cf/baai/bge-large-en-v1.5`, 1024-dim) and chat (`@cf/meta/llama-3.2-3b-instruct`). Postgres + pgvector stores chunks/embeddings; cosine similarity drives retrieval. A Vite React SPA (React Query + Zustand + Tailwind) is the dashboard. LangGraph JS (`@langchain/langgraph`) orchestrates the agentic graph. BullMQ + Redis runs document processing in the background.
 
-**Tech Stack:** TypeScript everywhere · Bun (runtime + workspaces) · NestJS · TypeORM · PostgreSQL 16 + pgvector · Redis + BullMQ (`@nestjs/bullmq`) · `@langchain/langgraph` · Cloudflare Workers AI REST · React 18 + Vite · `@tanstack/react-query` · Zustand · React Router · Tailwind CSS · JWT (`@nestjs/jwt` + passport-jwt) · Jest (backend) · Vitest + Testing Library (frontend).
+**Tech Stack:** TypeScript everywhere · Bun (runtime + workspaces) · NestJS · TypeORM · PostgreSQL 18 + pgvector · Redis + BullMQ (`@nestjs/bullmq`) · `@langchain/langgraph` · Cloudflare Workers AI REST · React 18 + Vite · `@tanstack/react-query` · Zustand · React Router · Tailwind CSS · JWT (`@nestjs/jwt` + passport-jwt) · Jest (backend) · Vitest + Testing Library (frontend).
 
 ## Global Constraints
 
@@ -61,39 +62,54 @@ This plan is sequenced into four milestones so each produces working, testable s
 
 ## Frontend Experience Direction
 
-The frontend should feel like a polished developer cockpit, not a marketing site. The first screen after login is the working app: navigation, document state, chat state, and citations should be visible and scannable without hero copy or decorative cards. The visual tone is quiet, elegant, and production-grade: precise spacing, strong information hierarchy, dense but calm layouts, and a small number of memorable product-specific details.
+`DESIGN.md` is the source of truth for the product UI direction. The frontend should feel like a premium AI developer dashboard: dark by default, modern, elegant, sharp, high contrast where useful, and calm enough for daily use. It should feel closer to Vercel/Linear/Raycast quality than a generic admin template, without copying any one product directly.
 
-**Design goal:** A software engineer should trust the app within 10 seconds because the UI makes uploaded knowledge, retrieval grounding, confidence, and agent steps legible.
+**Design goal:** A software engineer should trust the app within 10 seconds because the UI makes uploaded knowledge, RAG grounding, chat history, citations, and future agent steps feel visible, controlled, and production-ready.
 
 **Visual identity:**
-- Palette: `Ink #111827`, `Paper #F7FAF8`, `Panel #FFFFFF`, `Line #D7E0DD`, `Cyan #0E7490`, `Verified #047857`, `Warning #B45309`, `Danger #B91C1C`.
-- Typography: use a clean system sans for UI text, a restrained monospace for metadata, model names, chunk ids, scores, and step timing. No oversized hero typography inside the app shell.
-- Shape: 8px radius maximum for cards, panels, buttons, inputs, and modals. No nested cards. No gradient blobs, decorative orbs, or landing-page style hero sections.
-- Density: dashboards and tools should favor compact rows, sidebars, tabs, segmented controls, status chips, and source panels over large empty cards.
-- Motion: subtle only; hover/focus state, loading shimmer/skeleton, collapsible step details. Respect reduced motion.
+- Theme: dark mode default with light mode support. Theme preference belongs in local UI state and should affect the full shell.
+- Dark palette: `Background #0A0A0B`, `Surface #111214`, `Surface 2 #16181D`, `Border rgba(255,255,255,0.08)`, `Text #F5F7FA`, `Secondary #A4ACB9`, `Muted #7B8494`, `Accent Blue #4F8CFF`, `Accent Cyan #35C2FF`, `Accent Violet #8B5CF6`, `Success #22C55E`, `Warning #F59E0B`, `Danger #EF4444`.
+- Light palette: `Background #F6F8FB`, `Surface #FFFFFF`, `Surface 2 #F9FAFB`, `Border #E6EAF0`, `Text #0F172A`, `Secondary #475569`, `Muted #64748B`, `Accent Blue #2563EB`, `Accent Cyan #0891B2`, `Accent Violet #7C3AED`, `Success #16A34A`, `Warning #D97706`, `Danger #DC2626`.
+- Typography: prefer Geist/Inter/SF Pro style system stack; page titles around 32px semibold, section titles 20-24px, card titles 16-18px, body 14-16px, metadata 12px monospace where useful.
+- Shape and depth: radius scale `10/14/18/24px`, soft borders, restrained glow/gradient edges for active states, subtle shadows in light mode, subtle overlays in dark mode.
+- Motion: 150-220ms hover/focus/opacity/lift transitions, loading skeletons where useful, reduced motion respected.
+- Dependencies: keep the existing stack first. Add `lucide-react` only when icon coverage materially improves the shell/actions. Avoid shadcn/ui or Framer Motion unless a specific component truly needs them.
 
-**Signature interaction:** The app's memorable element is a persistent source rail. Answers, citations, retrieved chunks, document statuses, and agent steps should visually connect through document name + chunk number. In normal chat this appears as a right-side citation rail on desktop and collapsible citation drawer on mobile. In agent mode it becomes a step timeline with retrieval/evaluation/generation states.
+**Signature interactions:**
+- A premium left sidebar with logo/wordmark, grouped navigation, compact profile area, active pill/glow state, and logout pinned at bottom.
+- A refined page header on every protected page: eyebrow label, title, supporting description, and page actions.
+- A source/citation rail or citation chips that connect answers to document name + chunk number.
+- Agent mode later uses timeline/step cards with status, retry count, and expandable details.
 
 **Layout model:**
 ```text
-Desktop app shell
-nav rail | main workspace: table/chat/form | source/context rail
+Desktop
+sidebar 260-280px | page header + main workspace | optional context/source rail
+
+Tablet
+sidebar can compress; content grids become two columns
 
 Mobile
-top bar
-active workflow
-collapsible sources / steps
+top bar/drawer navigation; cards stack; chat input remains reachable
 ```
 
-**Component quality bar:**
-- App shell: persistent navigation, user/account action, active route state, responsive top bar on mobile.
-- Buttons: icon where obvious, text only where command clarity matters. All controls need visible focus states.
-- Tables/lists: document lists use compact rows/cards with status, chunk count, last updated, actions, and empty/loading/error states.
-- Chat: user and assistant messages must be readable, not toy-like; citations sit beside or beneath assistant responses with score and snippet.
-- Forms: clear labels, inline validation, disabled/pending states, and action-specific button labels.
-- Accessibility: keyboard reachable controls, semantic landmarks, labels for inputs, color not sole status signal.
+**Page quality bar:**
+- Dashboard: not empty; hero summary, quick actions, stats cards, recent activity/session overview, premium empty state.
+- Documents: search, filters/sort, status badges, chunk count, upload time/file type metadata, row/card actions.
+- Upload: large polished drag/drop zone, file support copy, progress/processing/completed/failed states, recent uploads.
+- Chat: conversation sidebar, premium message layout, citations, suggested prompts, RAG/Agent mode badge, input dock.
+- Agents: run list, status badges, node timeline, retry counts, timestamps, final output summary.
+- Settings: modular cards for profile, theme preference, model/config status, retrieval settings, security.
 
-**Copy style:** Plain engineering language. Use verbs like "Upload", "Ask", "Re-index", "Delete", "Create chat". Empty states tell the next action. Errors name the failure and recovery.
+**Component quality bar:**
+- Buttons: modern medium height, primary luminous but restrained, secondary subtle, visible hover/active/focus states.
+- Cards/panels: generous padding, soft border, subtle lift/brighten on hover, no nested decorative cards.
+- Inputs: clean borders, strong focus rings, refined search bars, readable labels.
+- Badges: small rounded pills with semantic colors.
+- Empty states: always include title, useful instruction, primary CTA, and a small visual/icon treatment.
+- Accessibility: semantic landmarks, keyboard reachable controls, labels for inputs, color not the only status signal.
+
+**Copy style:** Plain engineering language. Use verbs like "Upload", "Ask", "Re-index", "Delete", "Create chat", "Start agent run". Empty states tell the next action. Errors name failure and recovery.
 
 ---
 
@@ -229,44 +245,40 @@ git init && git add -A && git commit -m "chore: bun workspace scaffold + shared 
 
 ---
 
-### Task 0.2: Local infra (Postgres+pgvector, Redis) + env
+### Task 0.2: Local infra (Docker Postgres+pgvector, pgAdmin, Redis later) + env
 
-**No Docker.** Postgres (and, from M4, Redis) run as **local installs** on the dev machine.
+Postgres runs through Docker Compose with pgvector preinstalled. Redis is needed only from M4.
 
 **Files:**
-- Create: `.env.example`, `.env`
+- Create: `.env.example`, `.env`, `docker-compose.yml`, `docker/postgres/init/01-extensions.sql`
 
 **Interfaces:**
-- Produces: Postgres reachable at `postgresql://postgres:postgres@localhost:5432/devdocs` with the `vector` extension available; Redis at `redis://localhost:6379`.
+- Produces: Postgres reachable from the host at `postgresql://postgres:postgres@localhost:5433/devdocs` with the `vector` extension available; pgAdmin at `http://localhost:5050`; Redis at `redis://localhost:6379` from M4 onward.
 
-- [ ] **Step 1: Provision local Postgres** — a locally-installed PostgreSQL 16 server listening on `localhost:5432` with superuser `postgres` / password `postgres`. Create the app database:
+- [ ] **Step 1: Provision Docker Postgres** — add Compose services for `pgvector/pgvector:pg18` and `dpage/pgadmin4`. Mount Postgres 18 data at `/var/lib/postgresql`, not `/var/lib/postgresql/data`. Use host port `5433` for Postgres and `5050` for pgAdmin.
 
-```sql
-CREATE DATABASE devdocs;
-```
-
-  Then install the pgvector extension into that server (it does NOT ship with stock Postgres). On Windows the simplest route is the prebuilt pgvector binaries for your Postgres major version (drop `vector.dll` + the `vector*` files into the Postgres `lib/` and `share/extension/` dirs), or build from source. Verify it is available:
+- [ ] **Step 2: Add DB init SQL** — `docker/postgres/init/01-extensions.sql` creates `vector` and `"uuid-ossp"`. Verify:
 
 ```sql
-SELECT * FROM pg_available_extensions WHERE name = 'vector';
+SELECT extname FROM pg_extension WHERE extname IN ('vector', 'uuid-ossp');
 ```
 
-- [ ] **Step 2: Create `.env.example`** with every variable from Global Constraints (values blank except the model IDs and local URLs), then copy to `.env` and fill Cloudflare creds locally.
+- [ ] **Step 3: Create `.env.example`** with every variable from Global Constraints (values blank except the model IDs and local URLs), then copy to `.env` and fill Cloudflare creds locally.
 
 ```
 CLOUDFLARE_ACCOUNT_ID=
 CLOUDFLARE_API_TOKEN=
 CLOUDFLARE_CHAT_MODEL=@cf/meta/llama-3.2-3b-instruct
 CLOUDFLARE_EMBEDDING_MODEL=@cf/baai/bge-large-en-v1.5
-DATABASE_URL=postgresql://postgres:postgres@localhost:5432/devdocs
+DATABASE_URL=postgresql://postgres:postgres@localhost:5433/devdocs
 JWT_SECRET=change-me-in-prod
 REDIS_URL=redis://localhost:6379
-PORT=3000
+PORT=4000
 ```
 
-- [ ] **Step 3: Verify connectivity + pgvector** — connect with `DATABASE_URL` and run `CREATE EXTENSION IF NOT EXISTS vector;` against the `devdocs` database. Expected: `CREATE EXTENSION` (this also happens automatically in the M1 migration). Redis can be installed later (only M4 needs it).
+- [ ] **Step 4: Verify connectivity + pgvector** — run `bun run db:up`, then `bun run migration:run`. Expected: all migrations apply and `document_chunks.embedding` is `vector(1024)`.
 
-- [ ] **Step 4: Commit** `git add .env.example && git commit -m "chore: local postgres+pgvector and redis env config"` (`.env` is gitignored).
+- [ ] **Step 5: Commit** `git add .env.example docker-compose.yml docker/postgres/init/01-extensions.sql && git commit -m "chore: docker postgres pgvector and pgadmin env config"` (`.env` is gitignored).
 
 ---
 
@@ -1008,6 +1020,81 @@ export const useAuthStore = create<AuthState>()(persist((set) => ({
 
 ---
 
+## Milestone 2.5 — Premium Dashboard Redesign
+
+This milestone implements the `DESIGN.md` direction across the existing M1/M2 frontend before starting the agentic backend work. It is intentionally UI-focused: no new backend domain behavior unless a page needs an already-planned read endpoint. Keep functionality stable while upgrading visual quality.
+
+### Task 2.5: Theme tokens + premium shell foundation
+
+**Files:**
+- Modify: `apps/frontend/tailwind.config.ts`, `apps/frontend/src/index.css`, `apps/frontend/src/components/AppShell.tsx`, `apps/frontend/src/components/AppShell.test.tsx`
+- Optional create: `apps/frontend/src/stores/ui.ts` for theme preference.
+
+**Interfaces:**
+- Produces: dark-default theme tokens, light theme overrides, refined app shell, premium sidebar/header primitives, and accessible theme toggle plumbing.
+
+- [ ] **Step 1: Write failing shell/theme tests** — assert sidebar includes DevDocs AI wordmark, grouped nav links (`Overview`, `Documents`, `Upload`, `Chat`, `Agents`, `Sessions`, `Settings`), active state, account/logout action, and a theme toggle.
+- [ ] **Step 2: Implement CSS/Tailwind tokens** from `DESIGN.md`: dark/light surfaces, text, borders, accent colors, semantic colors, radius scale, button/panel/input classes, transitions, and focus rings.
+- [ ] **Step 3: Redesign `AppShell`** — 260-280px premium sidebar, mobile top bar, grouped navigation, compact user profile, logout pinned bottom, refined page header support (`eyebrow`, `description`, `actions`).
+- [ ] **Step 4: Run frontend tests/build.** Use browser screenshots if available; otherwise mark visual browser verification manual.
+- [ ] **Step 5: Commit** `git commit -am "feat(frontend): premium theme tokens and app shell"`.
+
+### Task 2.6: Dashboard premium overview
+
+**Files:**
+- Modify: `apps/frontend/src/pages/Dashboard.tsx`
+- Optional modify: `apps/frontend/src/api/documents.ts`, `apps/frontend/src/api/chat.ts` only if existing hooks already provide useful counts.
+
+**Interfaces:**
+- Produces: dashboard hero summary, quick actions, stats cards, recent activity placeholders, and intentional empty state using current APIs.
+
+- [ ] **Step 1: Add/adjust a focused frontend test** for visible quick actions and stats labels.
+- [ ] **Step 2: Implement hero panel** with title, supporting copy, primary `Upload documents` CTA and secondary `Start chat` CTA.
+- [ ] **Step 3: Implement stats/quick action cards** for documents, chat sessions, agent runs placeholder, and last activity/storage placeholder. Use real document/session counts where already available; placeholder only where backend does not exist yet.
+- [ ] **Step 4: Run frontend tests/build; commit** `git commit -am "feat(frontend): premium dashboard overview"`.
+
+### Task 2.7: Documents + upload premium workflows
+
+**Files:**
+- Modify: `apps/frontend/src/pages/DocumentsList.tsx`, `apps/frontend/src/pages/UploadDocuments.tsx`, `apps/frontend/src/components/DocumentCard.tsx`, `apps/frontend/src/components/FileUploader.tsx`, `apps/frontend/src/components/EmptyState.tsx`, `apps/frontend/src/components/LoadingState.tsx`
+
+**Interfaces:**
+- Produces: search/filter/sort controls, polished document cards/table-like scanability, refined upload drop zone, upload queue/recent upload presentation where current data supports it.
+
+- [ ] **Step 1: Add focused frontend tests** for document search/filter UI and PDF/txt/md upload support copy.
+- [ ] **Step 2: Implement document page controls** — search input, status filter, sort dropdown, compact metadata, status/chunk badges, action row.
+- [ ] **Step 3: Implement premium upload state** — large drop zone, support text, pending/progress visual state, recent uploads link/section using existing document list.
+- [ ] **Step 4: Run frontend tests/build; commit** `git commit -am "feat(frontend): premium documents and upload workflows"`.
+
+### Task 2.8: Chat premium workspace
+
+**Files:**
+- Modify: `apps/frontend/src/pages/Chat.tsx`, `apps/frontend/src/components/ChatWindow.tsx`, `apps/frontend/src/components/MessageBubble.tsx`, `apps/frontend/src/components/SourceCitationList.tsx`, `apps/frontend/src/components/SourceRail.tsx`
+
+**Interfaces:**
+- Produces: premium AI chat layout with conversation list, RAG mode badge, suggested prompts, refined input dock, readable message spacing, citation chips/rail, and empty/loading/error states.
+
+- [ ] **Step 1: Add focused frontend test** asserting suggested prompts and persisted citations render.
+- [ ] **Step 2: Redesign chat workspace** with session sidebar, main chat panel, source/citation area, mode badge, and prompt suggestions.
+- [ ] **Step 3: Keep server-persisted message behavior unchanged.**
+- [ ] **Step 4: Run frontend tests/build; commit** `git commit -am "feat(frontend): premium chat workspace"`.
+
+### Task 2.9: Agents and settings visual placeholders
+
+**Files:**
+- Modify: `apps/frontend/src/router.tsx`
+- Create or modify: `apps/frontend/src/pages/AgentRunDetails.tsx`, `apps/frontend/src/pages/Settings.tsx`
+
+**Interfaces:**
+- Produces: polished placeholder pages matching `DESIGN.md` for Agents/Sessions/Settings so navigation feels complete before M3 endpoints exist.
+
+- [ ] **Step 1: Add focused frontend test** for Settings theme/model/config sections and Agent timeline placeholder labels.
+- [ ] **Step 2: Implement Settings page sections** — profile, theme preference, Cloudflare AI config status, retrieval/model placeholders.
+- [ ] **Step 3: Implement Agents/Sessions placeholders** — timeline-style layout, status badges, empty state that explains agent runs arrive in M3.
+- [ ] **Step 4: Run frontend tests/build; commit** `git commit -am "feat(frontend): premium agents and settings placeholders"`.
+
+---
+
 ## Milestone 3 — LangGraph Agentic Loop
 
 ### Task 3.1: agent_runs + agent_steps schema
@@ -1245,7 +1332,7 @@ export function buildAgentGraph(deps) {
 
 ## Verification (end-to-end)
 
-**Infra:** Local Postgres 16 (with pgvector) running on `localhost:5432` (user/pass `postgres`/`postgres`, db `devdocs`); Redis local on `localhost:6379` (M4 only). `bun install` at root. `bun --cwd apps/backend run migration:run` applies all migrations (verify `\d document_chunks` shows `embedding vector(1024)` and the HNSW index exists).
+**Infra:** Docker Postgres 18 with pgvector running on host port `5433` (`postgres`/`postgres`, db `devdocs`); pgAdmin on `localhost:5050`; Redis local/container on `localhost:6379` from M4 onward. `bun install` at root. `bun --cwd apps/backend run migration:run` applies all migrations (verify `\d document_chunks` shows `embedding vector(1024)` and the HNSW index exists).
 
 **Backend tests:** `bun --cwd apps/backend run test` — all green, including the three required suites: `cloudflare-ai.service.spec`, `rag.service.spec`, `agents.service.spec`.
 
@@ -1259,6 +1346,8 @@ export function buildAgentGraph(deps) {
 5. Ask something not in the docs. Confirm the assistant explicitly says it lacks the information (confidence `Low`).
 
 **M2:** Upload a PDF → `ready`. Verify chat history persists across reload; sessions list works; citations render from persisted messages.
+
+**M2.5:** Toggle dark/light theme, verify shell/sidebar/header consistency, inspect dashboard/documents/upload/chat/settings pages on desktop and mobile, confirm active navigation, hover/focus states, readable contrast, and no text overlap.
 
 **M3:** Toggle Agent mode, ask a question requiring retrieval. Open the run details page and confirm all 8 nodes appear in order with latencies; force a weak query and confirm `retryRetrieval` fires (≤2) and the timeline shows it.
 

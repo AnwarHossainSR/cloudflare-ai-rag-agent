@@ -3,7 +3,7 @@
 Tracks execution of [IMPLEMENTATION_PLAN.md](IMPLEMENTATION_PLAN.md), task by task.
 Workflow: implement one task → tests green → commit → ask before next task.
 
-**Status:** 20 / 30 tasks complete · currently at **M2.4**
+**Status:** 21 / 30 tasks complete · currently at **M3.1**
 **Last updated:** 2026-06-30
 
 ---
@@ -42,13 +42,14 @@ Live DB migrations are applied through M2.2. Browser flows still need manual ver
 - [x] **1.9** Frontend document upload/list hooks, FileUploader, DocumentCard, pages (1 test)
 - [x] **1.10** Frontend ChatWindow + RAG query + citations (**M1 complete**, 1 test)
 
-### Milestone 2 — PDF, Chat History, Citations, Doc Management (in progress)
+### Milestone 2 — PDF, Chat History, Citations, Doc Management
 - [x] **2.0** Frontend visual system refresh: app shell, status badges, source rail, polished document/upload/chat surfaces
 - [x] **2.1** PDF text extraction via `pdf-parse`; backend/frontend upload allowlists include PDFs
 - [x] **2.2** ChatModule: persisted sessions/messages over RAG with owner-scoped access
 - [x] **2.3** Frontend chat history: sessions sidebar, persisted message replay, citations/confidence
+- [x] **2.4** Document management UX: status polling, chunk count, re-index, delete confirm (**M2 complete**)
 
-**Tests:** 28 backend specs passing · 8 frontend tests passing · backend `nest build` clean · frontend `vite build` clean
+**Tests:** 30 backend specs passing · 9 frontend tests passing · backend `nest build` clean · frontend `vite build` clean
 
 ---
 
@@ -56,9 +57,6 @@ Live DB migrations are applied through M2.2. Browser flows still need manual ver
 
 ### Milestone 1 — Basic RAG
 All M1 code tasks complete. Manual browser verification remains.
-
-### Milestone 2 — PDF, Chat History, Citations, Doc Management
-- [ ] **2.4** Document management UX (status polling, chunk count, reindex, delete)
 
 ### Milestone 3 — LangGraph Agentic Loop
 - [ ] **3.1** `agent_runs` + `agent_steps` schema
