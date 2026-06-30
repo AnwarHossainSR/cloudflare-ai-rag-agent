@@ -1061,10 +1061,9 @@ This milestone implements the `DESIGN.md` direction across the existing M1/M2 fr
 **Interfaces:**
 - Produces: search/filter/sort controls, polished document cards/table-like scanability, refined upload drop zone, upload queue/recent upload presentation where current data supports it.
 
-- [ ] **Step 1: Add focused frontend tests** for document search/filter UI and PDF/txt/md upload support copy.
-- [ ] **Step 2: Implement document page controls** — search input, status filter, sort dropdown, compact metadata, status/chunk badges, action row.
-- [ ] **Step 3: Implement premium upload state** — large drop zone, support text, pending/progress visual state, recent uploads link/section using existing document list.
-- [ ] **Step 4: Run frontend tests/build; commit** `git commit -am "feat(frontend): premium documents and upload workflows"`.
+- [ ] **Step 1: Implement document page controls** — search input, status filter, sort dropdown, compact metadata, status/chunk badges, action row.
+- [ ] **Step 2: Implement premium upload state** — large drop zone, support text, pending/progress visual state, recent uploads link/section using existing document list.
+- [ ] **Step 3: Run frontend build; commit** `git commit -am "feat(frontend): premium documents and upload workflows"`.
 
 ### Task 2.8: Chat premium workspace
 
@@ -1074,10 +1073,9 @@ This milestone implements the `DESIGN.md` direction across the existing M1/M2 fr
 **Interfaces:**
 - Produces: premium AI chat layout with conversation list, RAG mode badge, suggested prompts, refined input dock, readable message spacing, citation chips/rail, and empty/loading/error states.
 
-- [ ] **Step 1: Add focused frontend test** asserting suggested prompts and persisted citations render.
-- [ ] **Step 2: Redesign chat workspace** with session sidebar, main chat panel, source/citation area, mode badge, and prompt suggestions.
-- [ ] **Step 3: Keep server-persisted message behavior unchanged.**
-- [ ] **Step 4: Run frontend tests/build; commit** `git commit -am "feat(frontend): premium chat workspace"`.
+- [ ] **Step 1: Redesign chat workspace** with session sidebar, main chat panel, source/citation area, mode badge, and prompt suggestions.
+- [ ] **Step 2: Keep server-persisted message behavior unchanged.**
+- [ ] **Step 3: Run frontend build; commit** `git commit -am "feat(frontend): premium chat workspace"`.
 
 ### Task 2.9: Agents and settings visual placeholders
 
@@ -1088,10 +1086,9 @@ This milestone implements the `DESIGN.md` direction across the existing M1/M2 fr
 **Interfaces:**
 - Produces: polished placeholder pages matching `DESIGN.md` for Agents/Sessions/Settings so navigation feels complete before M3 endpoints exist.
 
-- [ ] **Step 1: Add focused frontend test** for Settings theme/model/config sections and Agent timeline placeholder labels.
-- [ ] **Step 2: Implement Settings page sections** — profile, theme preference, Cloudflare AI config status, retrieval/model placeholders.
-- [ ] **Step 3: Implement Agents/Sessions placeholders** — timeline-style layout, status badges, empty state that explains agent runs arrive in M3.
-- [ ] **Step 4: Run frontend tests/build; commit** `git commit -am "feat(frontend): premium agents and settings placeholders"`.
+- [ ] **Step 1: Implement Settings page sections** — profile, theme preference, Cloudflare AI config status, retrieval/model placeholders.
+- [ ] **Step 2: Implement Agents/Sessions placeholders** — timeline-style layout, status badges, empty state that explains agent runs arrive in M3.
+- [ ] **Step 3: Run frontend build; commit** `git commit -am "feat(frontend): premium agents and settings placeholders"`.
 
 ---
 
@@ -1220,17 +1217,14 @@ export function buildAgentGraph(deps) {
 
 **Files:**
 - Create: `src/api/agents.ts`, `src/components/AgentStepTimeline.tsx`, `src/pages/AgentRunDetails.tsx`; Modify: `src/components/ChatWindow.tsx`, `src/pages/Chat.tsx`
-- Test: `src/components/AgentStepTimeline.test.tsx`
 
 **Interfaces:**
 - Consumes: `/agents/query` + `/agents/runs/:id` (3.4).
 - Produces: `useAgentQuery()`, `useAgentRun(id)`; a chat "Agent mode" toggle routing the question to `/agents/query`; `<AgentStepTimeline steps>` rendering each node (name, latency, expandable input/output, retry markers); Agent run details page at `/agents/:runId`. Assistant answers in agent mode link to their run details.
 
-- [ ] **Step 1: Failing test** — render `<AgentStepTimeline>` with a fixture of 8 steps incl. a retry, assert all node names render in order and the retry is visually flagged.
-- [ ] **Step 2: Run it, expect FAIL.**
-- [ ] **Step 3: Implement** the hooks, timeline, details page, and the chat toggle (Zustand `ui` store flag).
-- [ ] **Step 4: Run test, expect PASS;** manual: ask in agent mode, open run details, see all 8 steps (M3 complete).
-- [ ] **Step 5: Commit** `git commit -am "feat(frontend): agent mode + step timeline + run details (M3 complete)"`.
+- [ ] **Step 1: Implement** the hooks, timeline, details page, and the chat toggle (Zustand `ui` store flag).
+- [ ] **Step 2: Run frontend build; manual:** ask in agent mode, open run details, see all 8 steps (M3 complete).
+- [ ] **Step 3: Commit** `git commit -am "feat(frontend): agent mode + step timeline + run details (M3 complete)"`.
 
 ---
 
@@ -1336,7 +1330,7 @@ export function buildAgentGraph(deps) {
 
 **Backend tests:** `bun --cwd apps/backend run test` — all green, including the three required suites: `cloudflare-ai.service.spec`, `rag.service.spec`, `agents.service.spec`.
 
-**Frontend tests:** `bun --cwd apps/frontend run test` — all green.
+**Frontend tests:** `bun --cwd apps/frontend run test` — existing suite (through Task 2.6) stays green; no new frontend tests are added from Task 2.7 onward (frontend verified via build + manual check instead).
 
 **M1 manual flow:**
 1. Start backend + frontend; open http://localhost:3000.
