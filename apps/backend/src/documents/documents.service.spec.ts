@@ -1,4 +1,4 @@
-import { NotFoundException, UnsupportedMediaTypeException } from '@nestjs/common';
+import { NotFoundException } from '@nestjs/common';
 import { DocumentStatus } from '@devdocs/shared';
 import { DocumentsService } from './documents.service';
 import { extractText } from './text-extraction';
@@ -17,11 +17,6 @@ describe('extractText', () => {
     );
   });
 
-  it('rejects pdf until M2', async () => {
-    await expect(extractText(Buffer.from('%PDF'), 'application/pdf')).rejects.toBeInstanceOf(
-      UnsupportedMediaTypeException,
-    );
-  });
 });
 
 describe('DocumentsService', () => {

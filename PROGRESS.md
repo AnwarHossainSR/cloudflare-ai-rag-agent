@@ -3,8 +3,8 @@
 Tracks execution of [IMPLEMENTATION_PLAN.md](IMPLEMENTATION_PLAN.md), task by task.
 Workflow: implement one task → tests green → commit → ask before next task.
 
-**Status:** 17 / 30 tasks complete · currently at **M2.1**
-**Last updated:** 2026-06-29
+**Status:** 18 / 30 tasks complete · currently at **M2.2**
+**Last updated:** 2026-06-30
 
 ---
 
@@ -45,8 +45,9 @@ with pgvector is running. All code is unit-tested with mocks, so building contin
 
 ### Milestone 2 — PDF, Chat History, Citations, Doc Management (in progress)
 - [x] **2.0** Frontend visual system refresh: app shell, status badges, source rail, polished document/upload/chat surfaces
+- [x] **2.1** PDF text extraction via `pdf-parse`; backend/frontend upload allowlists include PDFs
 
-**Tests:** 25 backend specs passing · 6 frontend tests passing · backend `nest build` clean · frontend `vite build` clean
+**Tests:** 26 backend specs passing · 7 frontend tests passing · backend `nest build` clean · frontend `vite build` clean
 
 ---
 
@@ -56,7 +57,6 @@ with pgvector is running. All code is unit-tested with mocks, so building contin
 All M1 code tasks complete. Live end-to-end verification remains deferred until pgvector is installed.
 
 ### Milestone 2 — PDF, Chat History, Citations, Doc Management
-- [ ] **2.1** PDF text extraction (`pdf-parse`)
 - [ ] **2.2** ChatModule — persisted sessions + messages
 - [ ] **2.3** Frontend — chat history sidebar + richer citations
 - [ ] **2.4** Document management UX (status polling, chunk count, reindex, delete)
