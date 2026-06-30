@@ -33,7 +33,7 @@ export class DocumentsController {
         validators: [
           new MaxFileSizeValidator({ maxSize: 10 * 1024 * 1024 }),
           new FileTypeValidator({
-            fileType: /(text\/plain|text\/markdown|application\/octet-stream)/,
+            fileType: /(text\/plain|text\/markdown|application\/pdf|application\/octet-stream)/,
           }),
         ],
       }),

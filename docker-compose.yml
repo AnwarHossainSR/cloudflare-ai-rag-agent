@@ -1,0 +1,36 @@
+services:
+  postgres:
+    image: pgvector/pgvector:pg18
+    container_name: devdocs-postgres
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: devdocs
+    ports:
+      - "5433:5432"
+    volumes:
+      - devdocs_postgres18_data:/var/lib/postgresql
+      - ./docker/postgres/init:/docker-entrypoint-initdb.d:ro
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres -d devdocs"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  pgadmin:
+    image: dpage/pgadmin4:latest
+    container_name: devdocs-pgadmin
+    depends_on:
+      postgres:
+        condition: service_healthy
+    environment:
+      PGADMIN_DEFAULT_EMAIL: admin@devdocs.ai
+      PGADMIN_DEFAULT_PASSWORD: admin
+    ports:
+      - "5050:80"
+    volumes:
+      - devdocs_pgadmin_data:/var/lib/pgadmin
+
+volumes:
+  devdocs_postgres18_data:
+  devdocs_pgadmin_data:

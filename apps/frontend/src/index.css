@@ -7,5 +7,23 @@
 }
 
 body {
-  @apply bg-slate-50 text-slate-900 antialiased;
+  @apply bg-paper text-ink antialiased;
+}
+
+@layer components {
+  .focus-ring {
+    @apply focus:outline-none focus:ring-2 focus:ring-cyan-700 focus:ring-offset-2 focus:ring-offset-paper;
+  }
+
+  .ui-button-primary {
+    @apply rounded-md bg-ink px-4 py-2 text-sm font-semibold text-white hover:bg-cyan-900 disabled:cursor-not-allowed disabled:opacity-60 focus-ring;
+  }
+
+  .ui-button-secondary {
+    @apply rounded-md border border-line bg-panel px-3 py-2 text-sm font-medium text-ink hover:bg-paper disabled:cursor-not-allowed disabled:opacity-60 focus-ring;
+  }
+
+  .ui-panel {
+    @apply rounded-md border border-line bg-panel shadow-sm;
+  }
 }

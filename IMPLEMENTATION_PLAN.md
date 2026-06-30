@@ -59,6 +59,44 @@ This plan is sequenced into four milestones so each produces working, testable s
 
 ---
 
+## Frontend Experience Direction
+
+The frontend should feel like a polished developer cockpit, not a marketing site. The first screen after login is the working app: navigation, document state, chat state, and citations should be visible and scannable without hero copy or decorative cards. The visual tone is quiet, elegant, and production-grade: precise spacing, strong information hierarchy, dense but calm layouts, and a small number of memorable product-specific details.
+
+**Design goal:** A software engineer should trust the app within 10 seconds because the UI makes uploaded knowledge, retrieval grounding, confidence, and agent steps legible.
+
+**Visual identity:**
+- Palette: `Ink #111827`, `Paper #F7FAF8`, `Panel #FFFFFF`, `Line #D7E0DD`, `Cyan #0E7490`, `Verified #047857`, `Warning #B45309`, `Danger #B91C1C`.
+- Typography: use a clean system sans for UI text, a restrained monospace for metadata, model names, chunk ids, scores, and step timing. No oversized hero typography inside the app shell.
+- Shape: 8px radius maximum for cards, panels, buttons, inputs, and modals. No nested cards. No gradient blobs, decorative orbs, or landing-page style hero sections.
+- Density: dashboards and tools should favor compact rows, sidebars, tabs, segmented controls, status chips, and source panels over large empty cards.
+- Motion: subtle only; hover/focus state, loading shimmer/skeleton, collapsible step details. Respect reduced motion.
+
+**Signature interaction:** The app's memorable element is a persistent source rail. Answers, citations, retrieved chunks, document statuses, and agent steps should visually connect through document name + chunk number. In normal chat this appears as a right-side citation rail on desktop and collapsible citation drawer on mobile. In agent mode it becomes a step timeline with retrieval/evaluation/generation states.
+
+**Layout model:**
+```text
+Desktop app shell
+nav rail | main workspace: table/chat/form | source/context rail
+
+Mobile
+top bar
+active workflow
+collapsible sources / steps
+```
+
+**Component quality bar:**
+- App shell: persistent navigation, user/account action, active route state, responsive top bar on mobile.
+- Buttons: icon where obvious, text only where command clarity matters. All controls need visible focus states.
+- Tables/lists: document lists use compact rows/cards with status, chunk count, last updated, actions, and empty/loading/error states.
+- Chat: user and assistant messages must be readable, not toy-like; citations sit beside or beneath assistant responses with score and snippet.
+- Forms: clear labels, inline validation, disabled/pending states, and action-specific button labels.
+- Accessibility: keyboard reachable controls, semantic landmarks, labels for inputs, color not sole status signal.
+
+**Copy style:** Plain engineering language. Use verbs like "Upload", "Ask", "Re-index", "Delete", "Create chat". Empty states tell the next action. Errors name the failure and recovery.
+
+---
+
 ## File Structure
 
 ```
@@ -877,6 +915,27 @@ export const useAuthStore = create<AuthState>()(persist((set) => ({
 ---
 
 ## Milestone 2 — PDF, Chat History, Citations, Document Management
+
+### Task 2.0: Frontend visual system refresh (production-grade app shell)
+
+**Files:**
+- Create: `apps/frontend/src/components/AppShell.tsx`, `apps/frontend/src/components/StatusBadge.tsx`, `apps/frontend/src/components/SourceRail.tsx`
+- Modify: `apps/frontend/src/index.css`, `tailwind.config.ts`, `src/router.tsx`, `src/pages/Dashboard.tsx`, `src/pages/Login.tsx`, `src/pages/UploadDocuments.tsx`, `src/pages/DocumentsList.tsx`, `src/pages/Chat.tsx`, `src/components/DocumentCard.tsx`, `src/components/ChatWindow.tsx`, `src/components/SourceCitationList.tsx`
+- Test: `apps/frontend/src/components/AppShell.test.tsx`, update existing frontend tests only where visible text changes.
+
+**Interfaces:**
+- Produces: a reusable production-grade app shell and visual system matching **Frontend Experience Direction**. Existing functionality stays unchanged.
+
+- [ ] **Step 1: Write failing visual contract tests** — render `AppShell` with nav items and assert active nav, main landmark, account action, and keyboard-visible links exist. Render `SourceRail` with citations and assert `documentName #chunkIndex`, score, snippet, and empty state render.
+- [ ] **Step 2: Run frontend tests, expect FAIL.**
+- [ ] **Step 3: Implement design tokens** in Tailwind/CSS: palette from Frontend Experience Direction, compact spacing scale, 8px max radius, status badge colors, focus rings, app background, panel and line colors. Avoid gradients, blobs, nested cards, and oversized hero layout.
+- [ ] **Step 4: Implement `AppShell`** with desktop nav rail, mobile top bar, active route styling, user action, and constrained workspace. Rewire protected pages through it; keep `/login` outside shell.
+- [ ] **Step 5: Implement `StatusBadge` and `SourceRail`** and reuse them in document cards, chat citations, agent run details later, and metrics later. The source rail is the signature interaction: right rail on desktop, collapsible section/drawer on mobile.
+- [ ] **Step 6: Polish existing M1 pages** — Login, Dashboard, UploadDocuments, DocumentsList, and Chat should feel like one product: dense lists, clear empty/loading/error states, production copy, no marketing hero cards.
+- [ ] **Step 7: Run frontend tests/build, expect PASS.** Use browser screenshot verification on desktop and mobile if a local browser tool is available; otherwise document that visual verification remains manual.
+- [ ] **Step 8: Commit** `git commit -am "feat(frontend): production app shell and visual system"`.
+
+---
 
 ### Task 2.1: PDF text extraction
 

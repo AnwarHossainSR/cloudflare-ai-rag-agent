@@ -3,7 +3,12 @@ import { useUploadDocument } from '../api/documents';
 import { LoadingState } from './LoadingState';
 
 const MAX_SIZE = 10 * 1024 * 1024;
-const ALLOWED_TYPES = new Set(['text/plain', 'text/markdown', 'application/octet-stream']);
+const ALLOWED_TYPES = new Set([
+  'text/plain',
+  'text/markdown',
+  'application/pdf',
+  'application/octet-stream',
+]);
 
 interface FileUploaderProps {
   onUploaded?: () => void;
@@ -17,11 +22,11 @@ export function FileUploader({ onUploaded }: FileUploaderProps) {
     if (!file) return;
     setError(null);
     if (file.size > MAX_SIZE) {
-      setError('File too large. Upload a txt or md file under 10MB.');
+      setError('File too large. Upload a txt, md, or pdf file under 10MB.');
       return;
     }
     if (!isAllowed(file)) {
-      setError('Unsupported file type. Upload a txt or md file.');
+      setError('Unsupported file type. Upload a txt, md, or pdf file.');
       return;
     }
     await upload.mutateAsync(file);
@@ -39,22 +44,22 @@ export function FileUploader({ onUploaded }: FileUploaderProps) {
   }
 
   return (
-    <section className="rounded-lg border border-slate-300 bg-white p-5 shadow-sm">
+    <section className="ui-panel p-5">
       <label
         onDragOver={(event) => event.preventDefault()}
         onDrop={onDrop}
-        className="flex cursor-pointer flex-col items-center justify-center rounded-lg border border-dashed border-cyan-700 bg-[#eef3f1] px-5 py-10 text-center focus-within:ring-2 focus-within:ring-cyan-500"
+        className="flex cursor-pointer flex-col items-center justify-center rounded-md border border-dashed border-cyan-700 bg-paper px-5 py-10 text-center focus-within:ring-2 focus-within:ring-cyan-700"
       >
-        <span className="text-base font-semibold text-slate-950">Drop a document here</span>
-        <span className="mt-1 text-sm text-slate-600">txt or md, max 10MB</span>
-        <span className="mt-4 rounded-lg bg-slate-950 px-4 py-2 text-sm font-semibold text-white">
+        <span className="text-base font-semibold text-ink">Drop a document here</span>
+        <span className="mt-1 text-sm text-muted">txt, md, or pdf, max 10MB</span>
+        <span className="mt-4 rounded-md bg-ink px-4 py-2 text-sm font-semibold text-white">
           Choose document
         </span>
         <input
           aria-label="Choose document"
           className="sr-only"
           type="file"
-          accept=".txt,.md,.markdown,text/plain,text/markdown"
+          accept=".txt,.md,.markdown,.pdf,text/plain,text/markdown,application/pdf"
           onChange={onChange}
         />
       </label>
@@ -68,5 +73,5 @@ export function FileUploader({ onUploaded }: FileUploaderProps) {
 }
 
 function isAllowed(file: File) {
-  return ALLOWED_TYPES.has(file.type) || /\.(txt|md|markdown)$/i.test(file.name);
+  return ALLOWED_TYPES.has(file.type) || /\.(txt|md|markdown|pdf)$/i.test(file.name);
 }
