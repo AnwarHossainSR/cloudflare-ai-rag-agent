@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Confidence, SourceCitation } from '@devdocs/shared';
 import { Repository } from 'typeorm';
@@ -80,5 +80,17 @@ export class AgentsService {
       );
       throw err;
     }
+  }
+
+  async getRun(userId: string, id: string): Promise<AgentRun & { steps: AgentStep[] }> {
+    const run = await this.runRepo.findOne({ where: { id } });
+    if (!run || run.userId !== userId) throw new NotFoundException('Agent run not found');
+
+    const steps = await this.stepRepo.find({
+      where: { runId: id },
+      order: { order: 'ASC' },
+    });
+
+    return { ...run, steps };
   }
 }

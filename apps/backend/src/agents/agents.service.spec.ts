@@ -1,3 +1,4 @@
+import { NotFoundException } from '@nestjs/common';
 import { Confidence } from '@devdocs/shared';
 import { CloudflareAiService } from '../cloudflare-ai/cloudflare-ai.service';
 import { RagService, RetrievedChunk } from '../rag/rag.service';
@@ -62,17 +63,19 @@ function makeAi(overrides: {
 }
 
 describe('AgentsService', () => {
-  let runRepo: { save: jest.Mock; create: jest.Mock };
-  let stepRepo: { save: jest.Mock; create: jest.Mock };
+  let runRepo: { save: jest.Mock; create: jest.Mock; findOne: jest.Mock };
+  let stepRepo: { save: jest.Mock; create: jest.Mock; find: jest.Mock };
 
   beforeEach(() => {
     runRepo = {
       create: jest.fn((data) => data),
       save: jest.fn(async (data) => ({ id: 'run-1', ...data })),
+      findOne: jest.fn(),
     };
     stepRepo = {
       create: jest.fn((data) => data),
       save: jest.fn(async (data) => data),
+      find: jest.fn(),
     };
   });
 
@@ -188,5 +191,58 @@ describe('AgentsService', () => {
     expect(savedRun.userId).toBe('user-1');
     expect(savedRun.question).toBe('Will this fail?');
     expect(stepRepo.save).not.toHaveBeenCalled();
+  });
+
+  describe('getRun', () => {
+    function makeService() {
+      const ai = makeAi();
+      const rag = { retrieve: jest.fn() } as unknown as jest.Mocked<Pick<RagService, 'retrieve'>>;
+      return new AgentsService(
+        ai as unknown as CloudflareAiService,
+        rag as unknown as RagService,
+        runRepo as any,
+        stepRepo as any,
+      );
+    }
+
+    it('returns the run with its ordered steps when the run belongs to the requesting user', async () => {
+      const run = { id: 'run-1', userId: 'user-1', question: 'How do I upload docs?' } as AgentRun;
+      const steps = [
+        { id: 'step-1', runId: 'run-1', name: 'classifyQuestion', order: 0 },
+        { id: 'step-2', runId: 'run-1', name: 'finalResponse', order: 1 },
+      ] as AgentStep[];
+      runRepo.findOne.mockResolvedValue(run);
+      stepRepo.find.mockResolvedValue(steps);
+
+      const service = makeService();
+      const result = await service.getRun('user-1', 'run-1');
+
+      expect(runRepo.findOne).toHaveBeenCalledWith({ where: { id: 'run-1' } });
+      expect(stepRepo.find).toHaveBeenCalledWith({
+        where: { runId: 'run-1' },
+        order: { order: 'ASC' },
+      });
+      expect(result).toEqual({ ...run, steps });
+    });
+
+    it('throws NotFoundException when the run does not exist', async () => {
+      runRepo.findOne.mockResolvedValue(null);
+
+      const service = makeService();
+
+      await expect(service.getRun('user-1', 'missing-run')).rejects.toBeInstanceOf(
+        NotFoundException,
+      );
+      expect(stepRepo.find).not.toHaveBeenCalled();
+    });
+
+    it('throws NotFoundException when the run exists but belongs to a different user', async () => {
+      runRepo.findOne.mockResolvedValue({ id: 'run-1', userId: 'user-2' });
+
+      const service = makeService();
+
+      await expect(service.getRun('user-1', 'run-1')).rejects.toBeInstanceOf(NotFoundException);
+      expect(stepRepo.find).not.toHaveBeenCalled();
+    });
   });
 });
