@@ -13,13 +13,12 @@ Workflow: implement one task → tests green → commit → ask before next task
 | Tool | State |
 |------|-------|
 | bun 1.3.14 / node 24 / git | ✅ available |
-| Docker | ⏳ compose setup added; install/start pending |
-| Postgres 18 (`localhost:5433`, `postgres`/`postgres`, db `devdocs`) | ⏳ Docker service pending |
-| pgvector extension | ⏳ installed automatically by Docker init once DB starts |
+| Docker | ✅ compose running Postgres + pgAdmin |
+| Postgres 18 (`localhost:5433`, `postgres`/`postgres`, db `devdocs`) | ✅ healthy |
+| pgvector extension | ✅ installed in Docker DB |
 | Redis (`localhost:6379`) | ⏳ needed at M4 only, not yet set up |
 
-Live-DB steps (migration run, end-to-end browser flows) are **deferred** until Docker Postgres
-with pgvector is running. All code is unit-tested with mocks, so building continues independently.
+Live DB migrations are applied through M2.2. Browser flows still need manual verification.
 
 ---
 
@@ -32,16 +31,16 @@ with pgvector is running. All code is unit-tested with mocks, so building contin
 - [x] **0.4** Vite + React + Tailwind + React Query bootstrap (production build verified)
 
 ### Milestone 1 — Basic RAG (in progress)
-- [x] **1.1** DB layer: `vectorTransformer` (3 tests), `User`/`Document`/`DocumentChunk` entities, `AppDataSource`, `InitM1` migration (tables + HNSW cosine index). *Live `migration:run` deferred (pgvector).*
+- [x] **1.1** DB layer: `vectorTransformer` (3 tests), `User`/`Document`/`DocumentChunk` entities, `AppDataSource`, `InitM1` migration (tables + HNSW cosine index). *Live migration applied.*
 - [x] **1.2** `CloudflareAiService` `embed()`/`chat()` + `CloudflareAiModule` (3 tests, fetch mocked)
-- [x] **1.3** Auth + Users: JWT register/login, `JwtAuthGuard`, `@CurrentUser`, DTOs (5 tests). TypeORM root wired with explicit entities; app **boots + connects to live DB** and registers `/api/auth`. *Live register/login deferred (needs migration → pgvector).*
+- [x] **1.3** Auth + Users: JWT register/login, `JwtAuthGuard`, `@CurrentUser`, DTOs (5 tests). TypeORM root wired with explicit entities; app **boots + connects to live DB** and registers `/api/auth`.
 - [x] **1.4** Token-aware chunking utility (`chunkText`) + tests
 - [x] **1.5** Embeddings pipeline: chunk → embed → persist `DocumentChunk` rows (2 tests)
 - [x] **1.6** DocumentsModule: JWT upload/process/list/get/delete for txt/md (6 tests)
 - [x] **1.7** RagModule: pgvector retrieval + grounded answer with citations (4 tests)
 - [x] **1.8** Frontend auth store/hooks, protected routes, Login + Dashboard shells (1 test)
 - [x] **1.9** Frontend document upload/list hooks, FileUploader, DocumentCard, pages (1 test)
-- [x] **1.10** Frontend ChatWindow + RAG query + citations (**M1 complete**, 1 test; live E2E deferred until pgvector)
+- [x] **1.10** Frontend ChatWindow + RAG query + citations (**M1 complete**, 1 test)
 
 ### Milestone 2 — PDF, Chat History, Citations, Doc Management (in progress)
 - [x] **2.0** Frontend visual system refresh: app shell, status badges, source rail, polished document/upload/chat surfaces
@@ -55,7 +54,7 @@ with pgvector is running. All code is unit-tested with mocks, so building contin
 ## ⏳ Remaining
 
 ### Milestone 1 — Basic RAG
-All M1 code tasks complete. Live end-to-end verification remains deferred until pgvector is installed.
+All M1 code tasks complete. Manual browser verification remains.
 
 ### Milestone 2 — PDF, Chat History, Citations, Doc Management
 - [ ] **2.3** Frontend — chat history sidebar + richer citations
@@ -78,7 +77,6 @@ All M1 code tasks complete. Live end-to-end verification remains deferred until 
 
 ---
 
-## Deferred verifications (need live infra)
-- `bun --cwd apps/backend run migration:run` (needs pgvector) — verify `embedding vector(1024)` + HNSW index
+## Deferred verifications (need manual browser run)
 - M1–M4 manual browser flows (register, upload, chat, agent timeline, metrics)
 - BullMQ worker run (needs Redis) — M4
