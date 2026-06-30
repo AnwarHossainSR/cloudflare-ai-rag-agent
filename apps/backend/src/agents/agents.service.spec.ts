@@ -63,7 +63,7 @@ function makeAi(overrides: {
 }
 
 describe('AgentsService', () => {
-  let runRepo: { save: jest.Mock; create: jest.Mock; findOne: jest.Mock };
+  let runRepo: { save: jest.Mock; create: jest.Mock; findOne: jest.Mock; find: jest.Mock };
   let stepRepo: { save: jest.Mock; create: jest.Mock; find: jest.Mock };
 
   beforeEach(() => {
@@ -71,6 +71,7 @@ describe('AgentsService', () => {
       create: jest.fn((data) => data),
       save: jest.fn(async (data) => ({ id: 'run-1', ...data })),
       findOne: jest.fn(),
+      find: jest.fn(),
     };
     stepRepo = {
       create: jest.fn((data) => data),
@@ -243,6 +244,27 @@ describe('AgentsService', () => {
 
       await expect(service.getRun('user-1', 'run-1')).rejects.toBeInstanceOf(NotFoundException);
       expect(stepRepo.find).not.toHaveBeenCalled();
+    });
+  });
+
+  it('lists recent runs owned by the requesting user', async () => {
+    const ai = makeAi();
+    const rag = { retrieve: jest.fn() } as unknown as jest.Mocked<Pick<RagService, 'retrieve'>>;
+    const runs = [{ id: 'run-1', userId: 'user-1' }] as AgentRun[];
+    runRepo.find.mockResolvedValue(runs);
+
+    const service = new AgentsService(
+      ai as unknown as CloudflareAiService,
+      rag as unknown as RagService,
+      runRepo as any,
+      stepRepo as any,
+    );
+
+    await expect(service.listRuns('user-1')).resolves.toEqual(runs);
+    expect(runRepo.find).toHaveBeenCalledWith({
+      where: { userId: 'user-1' },
+      order: { createdAt: 'DESC' },
+      take: 50,
     });
   });
 });

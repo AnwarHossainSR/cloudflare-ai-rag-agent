@@ -15,6 +15,11 @@ export class AgentsController {
     return this.agents.run(user.userId, dto.question, dto.sessionId);
   }
 
+  @Get('runs')
+  listRuns(@CurrentUser() user: CurrentUserData) {
+    return this.agents.listRuns(user.userId);
+  }
+
   @Get('runs/:id')
   getRun(@CurrentUser() user: CurrentUserData, @Param('id') id: string) {
     return this.agents.getRun(user.userId, id);

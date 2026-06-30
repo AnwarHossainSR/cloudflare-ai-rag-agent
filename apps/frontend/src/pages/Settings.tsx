@@ -94,11 +94,11 @@ export function Settings() {
 
         <SectionCard title="Retrieval settings" description="Controls how many chunks ground each answer.">
           <FieldRow label="Top K chunks" value="Default" />
-          <FieldRow label="Re-ranking" value="Coming soon" />
+          <FieldRow label="Re-ranking" value="Disabled" />
         </SectionCard>
 
         <SectionCard title="Embedding settings" description="How uploaded documents are chunked and indexed.">
-          <FieldRow label="Chunking strategy" value="Coming soon" />
+          <FieldRow label="Chunking strategy" value="Token window" />
           <FieldRow label="Vector store" value="pgvector" />
         </SectionCard>
 

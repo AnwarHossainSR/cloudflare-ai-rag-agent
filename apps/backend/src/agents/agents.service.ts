@@ -93,4 +93,12 @@ export class AgentsService {
 
     return { ...run, steps };
   }
+
+  listRuns(userId: string): Promise<AgentRun[]> {
+    return this.runRepo.find({
+      where: { userId },
+      order: { createdAt: 'DESC' },
+      take: 50,
+    });
+  }
 }

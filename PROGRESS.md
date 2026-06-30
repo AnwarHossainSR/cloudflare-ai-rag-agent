@@ -3,7 +3,7 @@
 Tracks execution of [IMPLEMENTATION_PLAN.md](IMPLEMENTATION_PLAN.md), task by task.
 Workflow: implement one task → tests green → commit → ask before next task.
 
-**Status:** 21 / 30 tasks complete · currently at **M3.1**
+**Status:** 30 / 35 tasks complete · currently at **M4.2**
 **Last updated:** 2026-06-30
 
 ---
@@ -16,9 +16,9 @@ Workflow: implement one task → tests green → commit → ask before next task
 | Docker | ✅ compose running Postgres + pgAdmin |
 | Postgres 18 (`localhost:5433`, `postgres`/`postgres`, db `devdocs`) | ✅ healthy |
 | pgvector extension | ✅ installed in Docker DB |
-| Redis (`localhost:6379`) | ⏳ needed at M4 only, not yet set up |
+| Redis (`localhost:6379`) | ✅ running through Docker Compose |
 
-Live DB migrations are applied through M2.2. Browser flows still need manual verification.
+Live DB migrations are applied through M4.1. Browser flows still need manual verification.
 
 ---
 
@@ -48,8 +48,23 @@ Live DB migrations are applied through M2.2. Browser flows still need manual ver
 - [x] **2.2** ChatModule: persisted sessions/messages over RAG with owner-scoped access
 - [x] **2.3** Frontend chat history: sessions sidebar, persisted message replay, citations/confidence
 - [x] **2.4** Document management UX: status polling, chunk count, re-index, delete confirm (**M2 complete**)
+- [x] **2.5** Theme tokens + premium shell foundation
+- [x] **2.6** Dashboard premium overview
+- [x] **2.7** Documents + upload premium workflows
+- [x] **2.8** Chat premium workspace
+- [x] **2.9** Agents and settings pages upgraded from placeholders
 
-**Tests:** 30 backend specs passing · 9 frontend tests passing · backend `nest build` clean · frontend `vite build` clean
+### Milestone 3 — LangGraph Agentic Loop
+- [x] **3.1** `agent_runs` + `agent_steps` schema
+- [x] **3.2** Agent state + 8 nodes (classify→rewrite→retrieve→evaluate→retry→generate→verify→final)
+- [x] **3.3** Build graph + `AgentsService` run/persist flow
+- [x] **3.4** `/agents/query`, `/agents/runs`, and run details endpoints
+- [x] **3.5** Frontend agent mode toggle, run list, step timeline, run details page (**M3 complete**)
+
+### Milestone 4 — Production Hardening
+- [x] **4.1** Document processing moved to BullMQ queue with local storage + Redis compose service
+
+**Tests:** 58 backend specs passing · 16 frontend tests passing · backend `nest build` clean · frontend `vite build` clean · backend boot smoke clean
 
 ---
 
@@ -58,15 +73,7 @@ Live DB migrations are applied through M2.2. Browser flows still need manual ver
 ### Milestone 1 — Basic RAG
 All M1 code tasks complete. Manual browser verification remains.
 
-### Milestone 3 — LangGraph Agentic Loop
-- [ ] **3.1** `agent_runs` + `agent_steps` schema
-- [ ] **3.2** Agent state + 8 nodes (classify→rewrite→retrieve→evaluate→retry→generate→verify→final) + tests
-- [ ] **3.3** Build graph + AgentsService (run + persist) + tests
-- [ ] **3.4** `/agents/query` endpoint + run retrieval
-- [ ] **3.5** Frontend — agent mode toggle + step timeline + run details
-
 ### Milestone 4 — Production Hardening
-- [ ] **4.1** Move document processing to BullMQ queue (needs Redis)
 - [ ] **4.2** Cost + token usage tracking
 - [ ] **4.3** Request logging interceptor
 - [ ] **4.4** Rate limiting on chat/agent endpoints
@@ -77,4 +84,4 @@ All M1 code tasks complete. Manual browser verification remains.
 
 ## Deferred verifications (need manual browser run)
 - M1–M4 manual browser flows (register, upload, chat, agent timeline, metrics)
-- BullMQ worker run (needs Redis) — M4
+- BullMQ upload worker flow (upload → processing → ready)

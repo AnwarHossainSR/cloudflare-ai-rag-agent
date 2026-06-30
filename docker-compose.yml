@@ -31,6 +31,17 @@ services:
     volumes:
       - devdocs_pgadmin_data:/var/lib/pgadmin
 
+  redis:
+    image: redis:7-alpine
+    container_name: devdocs-redis
+    ports:
+      - "6379:6379"
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
 volumes:
   devdocs_postgres18_data:
   devdocs_pgadmin_data:

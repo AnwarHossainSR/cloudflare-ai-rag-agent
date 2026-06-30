@@ -4,6 +4,7 @@ import { describe, expect, it, vi } from 'vitest';
 import { ChatWindow } from './ChatWindow';
 
 const postMessageMock = vi.hoisted(() => vi.fn());
+const agentQueryMock = vi.hoisted(() => vi.fn());
 
 vi.mock('../api/chat', () => ({
   useMessages: () => ({
@@ -29,6 +30,14 @@ vi.mock('../api/chat', () => ({
   }),
   usePostMessage: () => ({
     mutateAsync: postMessageMock,
+    isPending: false,
+    isError: false,
+  }),
+}));
+
+vi.mock('../api/agents', () => ({
+  useAgentQuery: () => ({
+    mutateAsync: agentQueryMock,
     isPending: false,
     isError: false,
   }),

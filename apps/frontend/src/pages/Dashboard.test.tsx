@@ -39,6 +39,13 @@ vi.mock('../api/chat', () => ({
   }),
 }));
 
+vi.mock('../api/agents', () => ({
+  useAgentRuns: () => ({
+    isLoading: false,
+    data: [{ id: 'r1', question: 'Run agent', status: 'completed', retryCount: 0 }],
+  }),
+}));
+
 describe('Dashboard', () => {
   beforeEach(() => {
     useAuthStore.setState({ token: 'token', user: { id: 'u1', email: 'dev@example.com' } });
@@ -64,7 +71,7 @@ describe('Dashboard', () => {
     expect(screen.getByText('Agent runs')).toBeInTheDocument();
     expect(screen.getByText('Indexed chunks')).toBeInTheDocument();
     expect(screen.getByText('7')).toBeInTheDocument(); // 3 + 4 chunks
-    expect(screen.getByText('1')).toBeInTheDocument(); // sessions
+    expect(screen.getAllByText('1')).toHaveLength(2); // sessions + agent runs
   });
 
   it('renders quick action shortcuts', () => {

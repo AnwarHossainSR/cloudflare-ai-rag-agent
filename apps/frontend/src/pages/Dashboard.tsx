@@ -1,5 +1,6 @@
 import { ReactNode } from 'react';
 import { Link } from 'react-router-dom';
+import { useAgentRuns } from '../api/agents';
 import { useSessions } from '../api/chat';
 import { useDocuments } from '../api/documents';
 import { AppShell } from '../components/AppShell';
@@ -48,9 +49,11 @@ export function Dashboard() {
   const logout = useAuthStore((s) => s.logout);
   const documents = useDocuments();
   const sessions = useSessions();
+  const agentRuns = useAgentRuns();
 
   const docs = documents.data ?? [];
   const chatSessions = sessions.data ?? [];
+  const runs = agentRuns.data ?? [];
   const readyDocs = docs.filter((doc) => doc.status === 'ready').length;
   const totalChunks = docs.reduce((sum, doc) => sum + (doc.chunkCount ?? 0), 0);
   const recentDocs = [...docs]
@@ -84,7 +87,7 @@ export function Dashboard() {
         <section className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
           <StatCard label="Documents" value={docs.length} helper={`${readyDocs} ready`} />
           <StatCard label="Chat sessions" value={chatSessions.length} helper="conversations" />
-          <StatCard label="Agent runs" value="—" helper="Arrives in M3" />
+          <StatCard label="Agent runs" value={runs.length} helper="completed or failed" />
           <StatCard label="Indexed chunks" value={totalChunks} helper="across documents" />
         </section>
 

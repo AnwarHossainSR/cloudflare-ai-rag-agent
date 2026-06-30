@@ -59,6 +59,16 @@ export function useAgentQuery() {
   });
 }
 
+export function useAgentRuns() {
+  return useQuery({
+    queryKey: ['agents', 'runs'],
+    queryFn: async () => {
+      const { data } = await api.get<AgentRun[]>('/agents/runs');
+      return data;
+    },
+  });
+}
+
 export function useAgentRun(id?: string) {
   return useQuery({
     queryKey: ['agents', 'run', id],
