@@ -7,6 +7,8 @@ import { Document } from '../documents/entities/document.entity';
 import { DocumentChunk } from '../documents/entities/document-chunk.entity';
 import { ChatSession } from '../chat/entities/chat-session.entity';
 import { ChatMessage } from '../chat/entities/chat-message.entity';
+import { AgentRun } from '../agents/entities/agent-run.entity';
+import { AgentStep } from '../agents/entities/agent-step.entity';
 
 // Load root .env when running the CLI (migrations) outside the Nest runtime.
 loadEnv({ path: join(__dirname, '../../../../.env') });
@@ -17,7 +19,7 @@ export const AppDataSource = new DataSource({
   url: process.env.DATABASE_URL,
   synchronize: false,
   logging: false,
-  entities: [User, Document, DocumentChunk, ChatSession, ChatMessage],
+  entities: [User, Document, DocumentChunk, ChatSession, ChatMessage, AgentRun, AgentStep],
   migrations: [join(__dirname, 'migrations/*.{ts,js}')],
   migrationsTransactionMode: 'each',
 });

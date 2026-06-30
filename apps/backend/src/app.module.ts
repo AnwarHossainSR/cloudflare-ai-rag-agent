@@ -13,6 +13,8 @@ import { Document } from './documents/entities/document.entity';
 import { DocumentChunk } from './documents/entities/document-chunk.entity';
 import { ChatSession } from './chat/entities/chat-session.entity';
 import { ChatMessage } from './chat/entities/chat-message.entity';
+import { AgentRun } from './agents/entities/agent-run.entity';
+import { AgentStep } from './agents/entities/agent-step.entity';
 
 @Module({
   imports: [
@@ -22,7 +24,7 @@ import { ChatMessage } from './chat/entities/chat-message.entity';
       useFactory: (config: ConfigService) => ({
         type: 'postgres',
         url: config.getOrThrow<string>('DATABASE_URL'),
-        entities: [User, Document, DocumentChunk, ChatSession, ChatMessage],
+        entities: [User, Document, DocumentChunk, ChatSession, ChatMessage, AgentRun, AgentStep],
         synchronize: false,
       }),
     }),
