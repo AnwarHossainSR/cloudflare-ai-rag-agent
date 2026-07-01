@@ -48,7 +48,7 @@ export class DocumentsService {
 
     try {
       const text = await extractText(buffer, doc.mimeType, doc.filename);
-      await this.embeddings.processDocument(doc.id, text, doc.filename);
+      await this.embeddings.processDocument(doc.id, text, doc.filename, doc.userId);
       doc.status = DocumentStatus.READY;
       doc.error = null;
     } catch (err) {
@@ -100,6 +100,7 @@ export class DocumentsService {
         doc.id,
         oldChunks.map((chunk) => chunk.content).join('\n\n'),
         doc.filename,
+        doc.userId,
       );
       doc.status = DocumentStatus.READY;
       doc.error = null;

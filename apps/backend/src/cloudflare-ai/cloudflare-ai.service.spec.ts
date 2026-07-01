@@ -1,6 +1,7 @@
 import { Test } from '@nestjs/testing';
 import { ConfigService } from '@nestjs/config';
 import { CloudflareAiService } from './cloudflare-ai.service';
+import { USAGE_RECORDER } from './types';
 
 const cfg = (k: string) =>
   ({
@@ -45,6 +46,37 @@ describe('CloudflareAiService', () => {
     });
     const out = await service.chat([{ role: 'user', content: 'hi' }]);
     expect(out.text).toBe('Hi there');
+  });
+
+  it('records token usage when a usage recorder is available', async () => {
+    const recorder = { record: jest.fn(async () => undefined) };
+    const mod = await Test.createTestingModule({
+      providers: [
+        CloudflareAiService,
+        { provide: ConfigService, useValue: { getOrThrow: cfg, get: cfg } },
+        { provide: USAGE_RECORDER, useValue: recorder },
+      ],
+    }).compile();
+    service = mod.get(CloudflareAiService);
+    (global.fetch as jest.Mock).mockResolvedValue({
+      ok: true,
+      json: async () => ({
+        success: true,
+        result: {
+          response: 'Hi there',
+          usage: { prompt_tokens: 10, completion_tokens: 5, total_tokens: 15 },
+        },
+      }),
+    });
+
+    await service.chat([{ role: 'user', content: 'hi' }], undefined, { userId: 'user-1' });
+
+    expect(recorder.record).toHaveBeenCalledWith({
+      userId: 'user-1',
+      model: '@cf/meta/llama-3.2-3b-instruct',
+      operation: 'chat',
+      usage: { prompt_tokens: 10, completion_tokens: 5, total_tokens: 15 },
+    });
   });
 
   it('throws when Cloudflare returns success:false', async () => {

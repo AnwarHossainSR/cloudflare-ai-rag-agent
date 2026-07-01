@@ -20,13 +20,14 @@ export class EmbeddingsService {
     documentId: string,
     text: string,
     sourceFilename: string,
+    userId?: string,
   ): Promise<number> {
     const chunks = chunkText(text);
     const embeddings: number[][] = [];
 
     for (let i = 0; i < chunks.length; i += EMBED_BATCH_SIZE) {
       const batch = chunks.slice(i, i + EMBED_BATCH_SIZE);
-      embeddings.push(...(await this.ai.embed(batch.map((chunk) => chunk.content))));
+      embeddings.push(...(await this.ai.embed(batch.map((chunk) => chunk.content), userId ? { userId } : undefined)));
     }
 
     if (

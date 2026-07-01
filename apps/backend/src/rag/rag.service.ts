@@ -25,7 +25,7 @@ export class RagService {
   ) {}
 
   async retrieve(userId: string, query: string, topK = 6): Promise<RetrievedChunk[]> {
-    const [queryEmbedding] = await this.ai.embed([query]);
+    const [queryEmbedding] = await this.ai.embed([query], { userId });
     const limit = clampTopK(topK);
     const rows = await this.chunkRepo.query(
       `SELECT c.document_id AS "documentId", d.filename AS "documentName",
@@ -53,7 +53,7 @@ export class RagService {
     }
 
     const context = buildContextText(chunks);
-    const { text } = await this.ai.chat(buildAnswerPrompt(context, question));
+    const { text } = await this.ai.chat(buildAnswerPrompt(context, question), undefined, { userId });
 
     return {
       answer: text,

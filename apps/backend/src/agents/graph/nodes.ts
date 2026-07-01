@@ -48,7 +48,7 @@ export function createNodes(deps: { ai: CloudflareAiService; rag: RagService }) 
     AgentStepName.CLASSIFY,
     async (state) => {
       const messages = buildClassifierPrompt(state.question);
-      const { text } = await ai.chat(messages);
+      const { text } = await ai.chat(messages, undefined, { userId: state.userId });
       const classification = parseClassification(text);
       return {
         input: { question: state.question },
@@ -60,7 +60,7 @@ export function createNodes(deps: { ai: CloudflareAiService; rag: RagService }) 
 
   const rewriteQuery = withStep<{ question: string }>(AgentStepName.REWRITE, async (state) => {
     const messages = buildRewriterPrompt(state.question);
-    const { text } = await ai.chat(messages);
+    const { text } = await ai.chat(messages, undefined, { userId: state.userId });
     const searchQuery = text.trim() || state.question;
     return {
       input: { question: state.question },
@@ -98,7 +98,9 @@ export function createNodes(deps: { ai: CloudflareAiService; rag: RagService }) 
 
       // Heuristic is inconclusive; ask the model.
       const context = buildContextText(chunks);
-      const { text } = await ai.chat(buildEvaluatorPrompt(state.question, context));
+      const { text } = await ai.chat(buildEvaluatorPrompt(state.question, context), undefined, {
+        userId: state.userId,
+      });
       const contextSufficient = /\bSUFFICIENT\b/i.test(text) && !/\bINSUFFICIENT\b/i.test(text);
 
       return {
@@ -114,7 +116,9 @@ export function createNodes(deps: { ai: CloudflareAiService; rag: RagService }) 
     async (state) => {
       const retryCount = state.retryCount + 1;
       const retryContext = `attempt ${retryCount}, previous query: "${state.searchQuery}"`;
-      const { text } = await ai.chat(buildRewriterPrompt(state.question, retryContext));
+      const { text } = await ai.chat(buildRewriterPrompt(state.question, retryContext), undefined, {
+        userId: state.userId,
+      });
       const searchQuery = text.trim() || state.searchQuery;
       return {
         input: { previousSearchQuery: state.searchQuery, retryCount },
@@ -129,7 +133,7 @@ export function createNodes(deps: { ai: CloudflareAiService; rag: RagService }) 
     async (state) => {
       const context = buildContextText(state.retrieved);
       const messages = buildAnswerPrompt(context, state.question);
-      const { text } = await ai.chat(messages);
+      const { text } = await ai.chat(messages, undefined, { userId: state.userId });
       const citations = state.retrieved.map(toCitation);
       const confidence = parseConfidence(text);
       return {
@@ -142,7 +146,9 @@ export function createNodes(deps: { ai: CloudflareAiService; rag: RagService }) 
 
   const verifyAnswer = withStep<{ answer: string }>(AgentStepName.VERIFY, async (state) => {
     const context = buildContextText(state.retrieved);
-    const { text } = await ai.chat(buildVerifierPrompt(state.question, context, state.answer));
+    const { text } = await ai.chat(buildVerifierPrompt(state.question, context, state.answer), undefined, {
+      userId: state.userId,
+    });
     const grounded = /\bGROUNDED\b/i.test(text) && !/\bUNGROUNDED\b/i.test(text);
     const confidence = grounded ? state.confidence : Confidence.LOW;
     return {

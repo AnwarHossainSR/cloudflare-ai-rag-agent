@@ -25,7 +25,7 @@ describe('EmbeddingsService', () => {
     const count = await service.processDocument('doc-1', text, 'guide.md');
 
     expect(count).toBeGreaterThan(1);
-    expect(ai.embed).toHaveBeenCalledWith(expect.arrayContaining([expect.stringContaining('word0')]));
+    expect(ai.embed.mock.calls[0][0]).toEqual(expect.arrayContaining([expect.stringContaining('word0')]));
     expect(repo.save).toHaveBeenCalledTimes(1);
     const rows = repo.save.mock.calls[0][0];
     expect(rows).toHaveLength(count);

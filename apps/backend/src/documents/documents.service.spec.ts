@@ -69,17 +69,17 @@ describe('DocumentsService', () => {
   });
 
   it('processes a document inline and marks it ready', async () => {
-    const doc = { id: 'doc-1', filename: 'guide.md', mimeType: 'text/markdown' } as any;
+    const doc = { id: 'doc-1', userId: 'user-1', filename: 'guide.md', mimeType: 'text/markdown' } as any;
 
     await service.processInline(doc, Buffer.from('# hello'));
 
     expect(savedStatuses).toEqual([DocumentStatus.PROCESSING, DocumentStatus.READY]);
-    expect(embeddings.processDocument).toHaveBeenCalledWith('doc-1', '# hello', 'guide.md');
+    expect(embeddings.processDocument).toHaveBeenCalledWith('doc-1', '# hello', 'guide.md', 'user-1');
   });
 
   it('marks the document failed when processing throws', async () => {
     embeddings.processDocument.mockRejectedValue(new Error('embed failed'));
-    const doc = { id: 'doc-1', filename: 'guide.md', mimeType: 'text/markdown' } as any;
+    const doc = { id: 'doc-1', userId: 'user-1', filename: 'guide.md', mimeType: 'text/markdown' } as any;
 
     await service.processInline(doc, Buffer.from('# hello'));
 
@@ -117,6 +117,7 @@ describe('DocumentsService', () => {
       'doc-1',
       'first chunk\n\nsecond chunk',
       'guide.md',
+      'user-1',
     );
   });
 });

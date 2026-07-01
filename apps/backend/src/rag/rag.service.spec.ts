@@ -32,7 +32,7 @@ describe('RagService', () => {
 
     const out = await service.retrieve('user-1', 'how upload works?', 5);
 
-    expect(ai.embed).toHaveBeenCalledWith(['how upload works?']);
+    expect(ai.embed).toHaveBeenCalledWith(['how upload works?'], { userId: 'user-1' });
     const [sql, params] = repo.query.mock.calls[0];
     expect(sql).toContain('embedding <=>');
     expect(sql).toContain('ORDER BY');

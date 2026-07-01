@@ -1,10 +1,13 @@
-import { BadGatewayException, Injectable } from '@nestjs/common';
+import { BadGatewayException, Inject, Injectable, Optional } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
-import { ChatMessage, TokenUsage } from './types';
+import { AiUsageContext, ChatMessage, TokenUsage, UsageRecorder, USAGE_RECORDER } from './types';
 
 @Injectable()
 export class CloudflareAiService {
-  constructor(private readonly config: ConfigService) {}
+  constructor(
+    private readonly config: ConfigService,
+    @Optional() @Inject(USAGE_RECORDER) private readonly usageRecorder?: UsageRecorder,
+  ) {}
 
   private get base() {
     const acc = this.config.getOrThrow<string>('CLOUDFLARE_ACCOUNT_ID');
@@ -28,21 +31,34 @@ export class CloudflareAiService {
     return json.result as T;
   }
 
-  async embed(texts: string[]): Promise<number[][]> {
+  async embed(texts: string[], context?: AiUsageContext): Promise<number[][]> {
     const model = this.config.getOrThrow<string>('CLOUDFLARE_EMBEDDING_MODEL');
-    const result = await this.run<{ data: number[][] }>(model, { text: texts });
+    const result = await this.run<{ data: number[][]; usage?: TokenUsage }>(model, { text: texts });
+    await this.usageRecorder?.record({
+      userId: context?.userId,
+      model,
+      operation: 'embed',
+      usage: result.usage,
+    });
     return result.data;
   }
 
   async chat(
     messages: ChatMessage[],
     opts?: { maxTokens?: number; temperature?: number },
+    context?: AiUsageContext,
   ): Promise<{ text: string; usage?: TokenUsage }> {
     const model = this.config.getOrThrow<string>('CLOUDFLARE_CHAT_MODEL');
     const result = await this.run<{ response: string; usage?: TokenUsage }>(model, {
       messages,
       max_tokens: opts?.maxTokens ?? 1024,
       temperature: opts?.temperature ?? 0.2,
+    });
+    await this.usageRecorder?.record({
+      userId: context?.userId,
+      model,
+      operation: 'chat',
+      usage: result.usage,
     });
     return { text: result.response, usage: result.usage };
   }
