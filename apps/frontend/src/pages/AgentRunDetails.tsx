@@ -5,6 +5,7 @@ import { AppShell } from '../components/AppShell';
 import { EmptyState } from '../components/EmptyState';
 import { LoadingState } from '../components/LoadingState';
 import { StatusBadge } from '../components/StatusBadge';
+import { learningHints } from '../content/learningHints';
 import { useAuthStore } from '../stores/auth';
 
 export function AgentRunDetails() {
@@ -20,6 +21,7 @@ export function AgentRunDetails() {
       userEmail={user?.email}
       eyebrow="Agents"
       description={`Run ${runId ?? ''}`}
+      learning={learningHints.agentRun}
       actions={
         <Link className="ui-button-secondary" to="/agents">
           Back to agents

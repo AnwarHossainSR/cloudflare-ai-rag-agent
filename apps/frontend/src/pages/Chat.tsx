@@ -4,6 +4,7 @@ import { ChatWindow } from '../components/ChatWindow';
 import { AppShell } from '../components/AppShell';
 import { useAuthStore } from '../stores/auth';
 import { LoadingState } from '../components/LoadingState';
+import { learningHints } from '../content/learningHints';
 
 export function Chat() {
   const user = useAuthStore((s) => s.user);
@@ -25,6 +26,7 @@ export function Chat() {
       userEmail={user?.email}
       eyebrow="AI Copilot"
       description="Ask grounded questions, answered from your indexed knowledge base with citations."
+      learning={learningHints.chat}
       actions={
         <button className="ui-button-primary" disabled={createSession.isPending} onClick={startChat} type="button">
           New chat

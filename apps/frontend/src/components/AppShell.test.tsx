@@ -1,5 +1,5 @@
 import { MemoryRouter } from 'react-router-dom';
-import { render, screen } from '@testing-library/react';
+import { fireEvent, render, screen } from '@testing-library/react';
 import { describe, expect, it, vi } from 'vitest';
 import { AppShell } from './AppShell';
 import { SourceRail } from './SourceRail';
@@ -45,6 +45,27 @@ describe('AppShell', () => {
     renderShell();
     expect(screen.getByRole('main', { name: /documents/i })).toBeInTheDocument();
     expect(screen.getByText('Document workspace')).toBeInTheDocument();
+  });
+
+  it('renders page learning help when provided', () => {
+    render(
+      <MemoryRouter>
+        <AppShell
+          learning={{
+            title: 'How documents work',
+            body: 'Ready documents are split into chunks and used by RAG answers.',
+            bullets: ['Upload creates a pending document.', 'The worker embeds chunks.'],
+          }}
+          onLogout={vi.fn()}
+          title="Documents"
+        >
+          <p>Document workspace</p>
+        </AppShell>
+      </MemoryRouter>,
+    );
+
+    fireEvent.click(screen.getByRole('button', { name: /how this page works/i }));
+    expect(screen.getByText('How documents work')).toBeInTheDocument();
   });
 });
 

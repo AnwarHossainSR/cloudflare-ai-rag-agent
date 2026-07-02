@@ -1,6 +1,7 @@
 import { ComponentType, ReactNode, SVGProps } from 'react';
 import { NavLink } from 'react-router-dom';
 import { useUiStore } from '../stores/ui';
+import { LearningHint, LearningHintContent } from './LearningHint';
 
 type IconProps = SVGProps<SVGSVGElement>;
 type Icon = ComponentType<IconProps>;
@@ -170,9 +171,19 @@ interface AppShellProps {
   eyebrow?: string;
   description?: string;
   actions?: ReactNode;
+  learning?: LearningHintContent;
 }
 
-export function AppShell({ children, onLogout, title, userEmail, eyebrow, description, actions }: AppShellProps) {
+export function AppShell({
+  children,
+  onLogout,
+  title,
+  userEmail,
+  eyebrow,
+  description,
+  actions,
+  learning,
+}: AppShellProps) {
   const initial = userEmail?.trim().charAt(0).toUpperCase() || '?';
   const hasHeader = Boolean(eyebrow || description || actions);
 
@@ -244,8 +255,17 @@ export function AppShell({ children, onLogout, title, userEmail, eyebrow, descri
                   <h1 className="mt-1 text-3xl font-semibold tracking-tight text-ink">{title}</h1>
                   {description ? <p className="mt-1.5 max-w-2xl text-sm text-secondary">{description}</p> : null}
                 </div>
-                {actions ? <div className="flex items-center gap-2">{actions}</div> : null}
+                {actions || learning ? (
+                  <div className="flex items-center gap-2">
+                    {learning ? <LearningHint content={learning} /> : null}
+                    {actions}
+                  </div>
+                ) : null}
               </header>
+            ) : learning ? (
+              <div className="mb-4 flex justify-end">
+                <LearningHint content={learning} />
+              </div>
             ) : null}
             {children}
           </div>

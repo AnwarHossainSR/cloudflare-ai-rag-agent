@@ -4,6 +4,7 @@ import { AppShell } from '../components/AppShell';
 import { DocumentCard } from '../components/DocumentCard';
 import { FileUploader } from '../components/FileUploader';
 import { LoadingState } from '../components/LoadingState';
+import { learningHints } from '../content/learningHints';
 import { useAuthStore } from '../stores/auth';
 
 export function UploadDocuments() {
@@ -19,6 +20,7 @@ export function UploadDocuments() {
       userEmail={user?.email}
       eyebrow="Knowledge base"
       description="Add txt, md, or pdf files. They're chunked and embedded automatically."
+      learning={learningHints.upload}
       actions={
         <Link className="ui-button-secondary" to="/documents">
           View all documents

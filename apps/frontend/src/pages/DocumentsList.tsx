@@ -5,6 +5,7 @@ import { AppShell } from '../components/AppShell';
 import { DocumentCard } from '../components/DocumentCard';
 import { EmptyState } from '../components/EmptyState';
 import { LoadingState } from '../components/LoadingState';
+import { learningHints } from '../content/learningHints';
 import { useAuthStore } from '../stores/auth';
 
 type StatusFilter = 'all' | DocumentStatus;
@@ -58,6 +59,7 @@ export function DocumentsList() {
       userEmail={user?.email}
       eyebrow="Knowledge base"
       description="Search, filter, and manage every document indexed for grounded chat."
+      learning={learningHints.documents}
       actions={
         <Link className="ui-button-primary" to="/documents/upload">
           Upload

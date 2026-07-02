@@ -1,7 +1,9 @@
 import { FormEvent, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useLogin, useRegister } from '../api/auth';
+import { LearningHint } from '../components/LearningHint';
 import { LoadingState } from '../components/LoadingState';
+import { learningHints } from '../content/learningHints';
 
 export function Login() {
   const [mode, setMode] = useState<'login' | 'register'>('login');
@@ -21,7 +23,10 @@ export function Login() {
   return (
     <main className="flex min-h-screen items-center justify-center bg-[#eef3f1] px-4 py-10 text-slate-950">
       <section className="w-full max-w-md rounded-lg border border-slate-300 bg-white p-6 shadow-sm">
-        <p className="font-mono text-xs uppercase tracking-wider text-cyan-700">DevDocs AI</p>
+        <div className="flex items-start justify-between gap-3">
+          <p className="font-mono text-xs uppercase tracking-wider text-cyan-700">DevDocs AI</p>
+          <LearningHint content={learningHints.login} />
+        </div>
         <h1 className="mt-2 text-2xl font-semibold">
           {mode === 'login' ? 'Sign in to your copilot' : 'Create your copilot account'}
         </h1>

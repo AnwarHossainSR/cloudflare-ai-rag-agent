@@ -3,6 +3,7 @@ import { useSessions } from '../api/chat';
 import { AppShell } from '../components/AppShell';
 import { EmptyState } from '../components/EmptyState';
 import { LoadingState } from '../components/LoadingState';
+import { learningHints } from '../content/learningHints';
 import { useAuthStore } from '../stores/auth';
 
 export function Sessions() {
@@ -17,6 +18,7 @@ export function Sessions() {
       userEmail={user?.email}
       eyebrow="Chat history"
       description="Browse saved conversations and jump back into any session."
+      learning={learningHints.sessions}
       actions={
         <Link className="ui-button-primary" to="/chat">
           New chat

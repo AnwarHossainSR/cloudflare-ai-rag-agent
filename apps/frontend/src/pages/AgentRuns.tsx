@@ -4,6 +4,7 @@ import { AppShell } from '../components/AppShell';
 import { EmptyState } from '../components/EmptyState';
 import { LoadingState } from '../components/LoadingState';
 import { StatusBadge } from '../components/StatusBadge';
+import { learningHints } from '../content/learningHints';
 import { useAuthStore } from '../stores/auth';
 
 export function AgentRuns() {
@@ -18,6 +19,7 @@ export function AgentRuns() {
       userEmail={user?.email}
       eyebrow="Agentic RAG"
       description="Run history for the multi-step LangGraph agent, including retries and final confidence."
+      learning={learningHints.agents}
       actions={
         <Link className="ui-button-primary" to="/chat">
           Start agent run

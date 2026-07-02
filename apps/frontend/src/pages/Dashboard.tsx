@@ -6,6 +6,7 @@ import { useDocuments } from '../api/documents';
 import { AppShell } from '../components/AppShell';
 import { EmptyState } from '../components/EmptyState';
 import { StatusBadge } from '../components/StatusBadge';
+import { learningHints } from '../content/learningHints';
 import { useAuthStore } from '../stores/auth';
 
 interface StatCardProps {
@@ -63,7 +64,7 @@ export function Dashboard() {
   const name = user?.email?.split('@')[0] ?? 'there';
 
   return (
-    <AppShell onLogout={logout} title="Overview" userEmail={user?.email}>
+    <AppShell learning={learningHints.overview} onLogout={logout} title="Overview" userEmail={user?.email}>
       <div className="space-y-7">
         <section className="ui-panel relative overflow-hidden bg-gradient-to-br from-accent/15 via-panel to-panel p-7">
           <div className="relative max-w-2xl">

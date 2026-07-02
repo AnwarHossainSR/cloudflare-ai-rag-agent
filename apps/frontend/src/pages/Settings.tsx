@@ -1,5 +1,6 @@
 import { ReactNode } from 'react';
 import { AppShell } from '../components/AppShell';
+import { learningHints } from '../content/learningHints';
 import { useAuthStore } from '../stores/auth';
 import { ThemeMode, useUiStore } from '../stores/ui';
 
@@ -41,6 +42,7 @@ export function Settings() {
       userEmail={user?.email}
       eyebrow="Workspace"
       description="Manage your profile, appearance, and how DevDocs AI is configured."
+      learning={learningHints.settings}
     >
       <div className="grid gap-5 lg:grid-cols-2">
         <SectionCard title="Profile" description="Your account on this workspace.">
