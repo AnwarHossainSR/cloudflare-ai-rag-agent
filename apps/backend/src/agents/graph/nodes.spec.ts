@@ -10,6 +10,7 @@ function baseState(overrides: Partial<State> = {}): State {
   return {
     userId: 'user-1',
     question: 'How do I upload docs?',
+    documentIds: [],
     classification: '',
     searchQuery: '',
     retrieved: [],
@@ -113,10 +114,18 @@ describe('agent graph nodes', () => {
         baseState({ userId: 'user-9', searchQuery: 'upload api' }),
       );
 
-      expect(rag.retrieve).toHaveBeenCalledWith('user-9', 'upload api');
+      expect(rag.retrieve).toHaveBeenCalledWith('user-9', 'upload api', undefined, []);
       expect(update.retrieved).toEqual([sampleChunk]);
       expect(update.steps).toHaveLength(1);
       expect(update.steps![0].name).toBe(AgentStepName.RETRIEVE);
+    });
+
+    it('passes selected document ids to RAG retrieval', async () => {
+      await nodes.retrieveContext(
+        baseState({ userId: 'user-9', searchQuery: 'upload api', documentIds: ['doc-1'] } as any),
+      );
+
+      expect(rag.retrieve).toHaveBeenCalledWith('user-9', 'upload api', undefined, ['doc-1']);
     });
   });
 

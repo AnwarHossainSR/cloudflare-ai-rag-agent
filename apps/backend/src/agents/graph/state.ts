@@ -12,6 +12,7 @@ export interface StepLog {
 export const AgentState = Annotation.Root({
   userId: Annotation<string>(),
   question: Annotation<string>(),
+  documentIds: Annotation<string[]>({ reducer: (_, n) => n, default: () => [] }),
   classification: Annotation<string>(),
   searchQuery: Annotation<string>(),
   retrieved: Annotation<RetrievedChunk[]>({ reducer: (_, n) => n, default: () => [] }),

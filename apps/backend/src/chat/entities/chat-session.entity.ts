@@ -13,6 +13,9 @@ export class ChatSession {
   @Column({ type: 'varchar', length: 160 })
   title!: string;
 
+  @Column({ name: 'document_ids', type: 'uuid', array: true, default: () => "'{}'::uuid[]" })
+  documentIds!: string[];
+
   @CreateDateColumn({ name: 'created_at', type: 'timestamptz' })
   createdAt!: Date;
 

@@ -16,9 +16,9 @@ export class ChatService {
     private readonly rag: RagService,
   ) {}
 
-  createSession(userId: string, title?: string): Promise<ChatSession> {
+  createSession(userId: string, title?: string, documentIds: string[] = []): Promise<ChatSession> {
     return this.sessions.save(
-      this.sessions.create({ userId, title: title?.trim() || 'New chat' }),
+      this.sessions.create({ userId, title: title?.trim() || 'New chat', documentIds }),
     );
   }
 
@@ -50,7 +50,7 @@ export class ChatService {
       }),
     );
 
-    const answer = await this.rag.answer(userId, question);
+    const answer = await this.rag.answer(userId, question, undefined, session.documentIds ?? []);
     return this.messages.save(
       this.messages.create({
         sessionId,

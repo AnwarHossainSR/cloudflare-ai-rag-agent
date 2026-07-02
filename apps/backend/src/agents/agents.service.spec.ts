@@ -143,6 +143,26 @@ describe('AgentsService', () => {
     expect(names[names.length - 1]).toBe('finalResponse');
   });
 
+  it('passes explicit document scope into graph retrieval', async () => {
+    const ai = makeAi();
+    const rag = {
+      retrieve: jest.fn().mockResolvedValue([strongChunk]),
+    } as unknown as jest.Mocked<Pick<RagService, 'retrieve'>>;
+
+    const service = new AgentsService(
+      ai as unknown as CloudflareAiService,
+      rag as unknown as RagService,
+      runRepo as any,
+      stepRepo as any,
+    );
+
+    await (service.run as any)('user-1', 'How do I upload docs?', 'session-1', ['doc-1']);
+
+    expect(rag.retrieve).toHaveBeenCalledWith('user-1', 'rewritten search query', undefined, [
+      'doc-1',
+    ]);
+  });
+
   it('terminates with a low-confidence "not enough information" style answer when context never improves', async () => {
     const ai = makeAi({
       evaluate: () => 'INSUFFICIENT',

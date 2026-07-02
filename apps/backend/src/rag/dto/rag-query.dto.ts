@@ -1,4 +1,4 @@
-import { IsInt, IsOptional, IsString, Max, Min, MinLength } from 'class-validator';
+import { IsArray, IsInt, IsOptional, IsString, IsUUID, Max, Min, MinLength } from 'class-validator';
 
 export class RagQueryDto {
   @IsString()
@@ -10,4 +10,9 @@ export class RagQueryDto {
   @Min(5)
   @Max(8)
   topK?: number;
+
+  @IsOptional()
+  @IsArray()
+  @IsUUID('4', { each: true })
+  documentIds?: string[];
 }

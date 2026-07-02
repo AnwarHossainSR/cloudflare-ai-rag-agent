@@ -12,7 +12,7 @@ export class AgentsController {
 
   @Post('query')
   query(@CurrentUser() user: CurrentUserData, @Body() dto: AgentQueryDto) {
-    return this.agents.run(user.userId, dto.question, dto.sessionId);
+    return this.agents.run(user.userId, dto.question, dto.sessionId, dto.documentIds ?? []);
   }
 
   @Get('runs')

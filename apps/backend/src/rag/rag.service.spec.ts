@@ -37,7 +37,7 @@ describe('RagService', () => {
     expect(sql).toContain('embedding <=>');
     expect(sql).toContain('ORDER BY');
     expect(sql).toContain('LIMIT');
-    expect(params).toEqual([expect.stringMatching(/^\[0\.01/), 'user-1', 5]);
+    expect(params).toEqual([expect.stringMatching(/^\[0\.01/), 'user-1', 5, null]);
     expect(out).toEqual([
       {
         documentId: 'doc-1',
@@ -46,6 +46,19 @@ describe('RagService', () => {
         content: 'Use the upload endpoint.',
         score: 0.91,
       },
+    ]);
+  });
+
+  it('limits retrieval to selected document ids when provided', async () => {
+    await (service.retrieve as any)('user-1', 'upload docs', 5, ['doc-1', 'doc-2']);
+
+    const [sql, params] = repo.query.mock.calls[0];
+    expect(sql).toContain('c.document_id = ANY');
+    expect(params).toEqual([
+      expect.stringMatching(/^\[0\.01/),
+      'user-1',
+      5,
+      ['doc-1', 'doc-2'],
     ]);
   });
 
@@ -78,6 +91,14 @@ describe('RagService', () => {
         snippet: 'Upload docs with POST /documents/upload.',
       },
     ]);
+  });
+
+  it('passes selected document ids from answer to retrieval', async () => {
+    const retrieve = jest.spyOn(service, 'retrieve').mockResolvedValue([]);
+
+    await (service.answer as any)('user-1', 'How do I upload docs?', 8, ['doc-1']);
+
+    expect(retrieve).toHaveBeenCalledWith('user-1', 'How do I upload docs?', 8, ['doc-1']);
   });
 
   it('does not call chat when no context is retrieved', async () => {

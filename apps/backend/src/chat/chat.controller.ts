@@ -13,7 +13,7 @@ export class ChatController {
 
   @Post('sessions')
   createSession(@CurrentUser() user: CurrentUserData, @Body() dto: CreateSessionDto) {
-    return this.chat.createSession(user.userId, dto.title);
+    return this.chat.createSession(user.userId, dto.title, dto.documentIds ?? []);
   }
 
   @Get('sessions')

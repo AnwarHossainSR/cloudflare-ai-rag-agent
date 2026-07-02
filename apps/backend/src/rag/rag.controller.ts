@@ -12,6 +12,6 @@ export class RagController {
 
   @Post('query')
   query(@CurrentUser() user: CurrentUserData, @Body() dto: RagQueryDto) {
-    return this.rag.answer(user.userId, dto.question, dto.topK);
+    return this.rag.answer(user.userId, dto.question, dto.topK, dto.documentIds ?? []);
   }
 }

@@ -1,4 +1,4 @@
-import { IsOptional, IsString, IsUUID, MinLength } from 'class-validator';
+import { IsArray, IsOptional, IsString, IsUUID, MinLength } from 'class-validator';
 
 export class AgentQueryDto {
   @IsString()
@@ -8,4 +8,9 @@ export class AgentQueryDto {
   @IsOptional()
   @IsUUID()
   sessionId?: string;
+
+  @IsOptional()
+  @IsArray()
+  @IsUUID('4', { each: true })
+  documentIds?: string[];
 }

@@ -69,12 +69,12 @@ export function createNodes(deps: { ai: CloudflareAiService; rag: RagService }) 
     };
   });
 
-  const retrieveContext = withStep<{ userId: string; searchQuery: string }>(
+  const retrieveContext = withStep<{ userId: string; searchQuery: string; documentIds: string[] }>(
     AgentStepName.RETRIEVE,
     async (state) => {
-      const retrieved = await rag.retrieve(state.userId, state.searchQuery);
+      const retrieved = await rag.retrieve(state.userId, state.searchQuery, undefined, state.documentIds);
       return {
-        input: { userId: state.userId, searchQuery: state.searchQuery },
+        input: { userId: state.userId, searchQuery: state.searchQuery, documentIds: state.documentIds },
         output: { count: retrieved.length },
         update: { retrieved },
       };

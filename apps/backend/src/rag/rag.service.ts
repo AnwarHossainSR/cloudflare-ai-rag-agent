@@ -24,9 +24,15 @@ export class RagService {
     private readonly ai: CloudflareAiService,
   ) {}
 
-  async retrieve(userId: string, query: string, topK = 6): Promise<RetrievedChunk[]> {
+  async retrieve(
+    userId: string,
+    query: string,
+    topK = 6,
+    documentIds: string[] = [],
+  ): Promise<RetrievedChunk[]> {
     const [queryEmbedding] = await this.ai.embed([query], { userId });
     const limit = clampTopK(topK);
+    const scope = documentIds.length ? documentIds : null;
     const rows = await this.chunkRepo.query(
       `SELECT c.document_id AS "documentId", d.filename AS "documentName",
               c.chunk_index AS "chunkIndex", c.content,
@@ -34,16 +40,22 @@ export class RagService {
          FROM document_chunks c
          JOIN documents d ON d.id = c.document_id
         WHERE d.user_id = $2 AND d.status = 'ready'
+          AND ($4::uuid[] IS NULL OR c.document_id = ANY($4::uuid[]))
         ORDER BY c.embedding <=> $1::vector
         LIMIT $3`,
-      [vectorTransformer.to(queryEmbedding), userId, limit],
+      [vectorTransformer.to(queryEmbedding), userId, limit, scope],
     );
 
     return rows.map((row: RetrievedChunk) => ({ ...row, score: Number(row.score) }));
   }
 
-  async answer(userId: string, question: string, topK = 6): Promise<RagQueryResponse> {
-    const chunks = await this.retrieve(userId, question, clampTopK(topK));
+  async answer(
+    userId: string,
+    question: string,
+    topK = 6,
+    documentIds: string[] = [],
+  ): Promise<RagQueryResponse> {
+    const chunks = await this.retrieve(userId, question, clampTopK(topK), documentIds);
     if (!chunks.length) {
       return {
         answer: 'The documents do not contain enough information to answer this question.',

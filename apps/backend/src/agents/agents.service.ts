@@ -31,9 +31,14 @@ export class AgentsService {
     this.graph = buildAgentGraph({ ai: this.ai, rag: this.rag });
   }
 
-  async run(userId: string, question: string, sessionId?: string): Promise<AgentRunResult> {
+  async run(
+    userId: string,
+    question: string,
+    sessionId?: string,
+    documentIds: string[] = [],
+  ): Promise<AgentRunResult> {
     try {
-      const state = await this.graph.invoke({ userId, question });
+      const state = await this.graph.invoke({ userId, question, documentIds });
 
       const savedRun = await this.runRepo.save(
         this.runRepo.create({
